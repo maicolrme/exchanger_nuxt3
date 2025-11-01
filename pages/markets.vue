@@ -1,95 +1,257 @@
+<script setup>
+import { ref, computed } from 'vue'
+definePageMeta({
+  layout: 'p2p'
+});
+// --- Estado (Reemplaza la 'data' de Vue 2) ---
+
+// Ref para la barra de búsqueda
+const searchQuery = ref('');
+
+// Ref para la categoría seleccionada
+const selectedCategory = ref('all');
+
+// Refs para el ordenamiento de la tabla
+const sortColumn = ref(null);
+const sortDirection = ref('desc');
+
+// Ref para los datos de los mercados
+const markets = ref([
+  { symbol: 'BTC/USDT', name: 'Bitcoin', price: '64,285.50', change: 2.34, high24h: '65,120.00', low24h: '63,450.00', volume24h: '2,456', isFavorite: false, category: 'spot' },
+  { symbol: 'ETH/USDT', name: 'Ethereum', price: '3,245.80', change: 5.67, high24h: '3,280.00', low24h: '3,100.00', volume24h: '1,823', isFavorite: true, category: 'spot' },
+  { symbol: 'BNB/USDT', name: 'Binance Coin', price: '425.30', change: -1.23, high24h: '435.00', low24h: '420.00', volume24h: '567', isFavorite: false, category: 'spot' },
+  { symbol: 'SOL/USDT', name: 'Solana', price: '142.50', change: 8.45, high24h: '145.00', low24h: '135.00', volume24h: '892', isFavorite: true, category: 'defi' },
+  { symbol: 'XRP/USDT', name: 'Ripple', price: '0.5234', change: -3.12, high24h: '0.5450', low24h: '0.5100', volume24h: '1,234', isFavorite: false, category: 'spot' },
+  { symbol: 'ADA/USDT', name: 'Cardano', price: '0.4567', change: 1.89, high24h: '0.4650', low24h: '0.4400', volume24h: '678', isFavorite: false, category: 'spot' },
+  { symbol: 'DOGE/USDT', name: 'Dogecoin', price: '0.0823', change: -2.45, high24h: '0.0850', low24h: '0.0800', volume24h: '456', isFavorite: false, category: 'spot' },
+  { symbol: 'AVAX/USDT', name: 'Avalanche', price: '35.67', change: 4.23, high24h: '36.50', low24h: '34.00', volume24h: '345', isFavorite: false, category: 'defi' },
+  { symbol: 'DOT/USDT', name: 'Polkadot', price: '6.789', change: -0.89, high24h: '6.950', low24h: '6.650', volume24h: '234', isFavorite: true, category: 'spot' },
+  { symbol: 'MATIC/USDT', name: 'Polygon', price: '0.8456', change: 3.45, high24h: '0.8700', low24h: '0.8200', volume24h: '567', isFavorite: false, category: 'defi' },
+  { symbol: 'LINK/USDT', name: 'Chainlink', price: '14.567', change: 6.78, high24h: '15.000', low24h: '13.800', volume24h: '432', isFavorite: false, category: 'defi' },
+  { symbol: 'UNI/USDT', name: 'Uniswap', price: '8.234', change: -4.56, high24h: '8.650', low24h: '8.100', volume24h: '298', isFavorite: false, category: 'defi' },
+  { symbol: 'LTC/USDT', name: 'Litecoin', price: '87.65', change: 1.23, high24h: '89.00', low24h: '86.00', volume24h: '345', isFavorite: false, category: 'spot' },
+  { symbol: 'ATOM/USDT', name: 'Cosmos', price: '10.234', change: 7.89, high24h: '10.500', low24h: '9.800', volume24h: '267', isFavorite: false, category: 'defi' },
+  { symbol: 'TRX/USDT', name: 'TRON', price: '0.1234', change: -1.67, high24h: '0.1280', low24h: '0.1200', volume24h: '189', isFavorite: false, category: 'spot' }
+]);
+
+// --- Propiedades Computadas (Reemplaza 'computed') ---
+const filteredMarkets = computed(() => {
+  let result = markets.value;
+
+  // Filtrar por búsqueda
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    result = result.filter(m =>
+      m.symbol.toLowerCase().includes(query) ||
+      m.name.toLowerCase().includes(query)
+    );
+  }
+
+  // Filtrar por categoría
+  if (selectedCategory.value === 'favorites') {
+    result = result.filter(m => m.isFavorite);
+  } else if (selectedCategory.value === 'spot') {
+    result = result.filter(m => m.category === 'spot');
+  } else if (selectedCategory.value === 'defi') {
+    result = result.filter(m => m.category === 'defi');
+  } else if (selectedCategory.value === 'gainers') {
+    result = result.filter(m => m.change > 0).sort((a, b) => b.change - a.change);
+  } else if (selectedCategory.value === 'losers') {
+    result = result.filter(m => m.change < 0).sort((a, b) => a.change - b.change);
+  }
+
+  // Ordenar
+  if (sortColumn.value) {
+    result = [...result].sort((a, b) => {
+      let aVal = a[sortColumn.value];
+      let bVal = b[sortColumn.value];
+
+      // Convertir strings con comas a números para ordenar
+      if (sortColumn.value === 'price' || sortColumn.value === 'volume24h') {
+        aVal = parseFloat(String(aVal).replace(/,/g, ''));
+        bVal = parseFloat(String(bVal).replace(/,/g, ''));
+      }
+
+      if (sortDirection.value === 'asc') {
+        return aVal > bVal ? 1 : -1;
+      } else {
+        return aVal < bVal ? 1 : -1;
+      }
+    });
+  }
+
+  return result;
+});
+
+// --- Métodos (Reemplaza 'methods') ---
+
+// He eliminado toggleTheme() porque la lógica del tema
+// pertenece al layout, no a la página.
+
+function toggleFavorite(symbol) {
+  const market = markets.value.find(m => m.symbol === symbol);
+  if (market) {
+    market.isFavorite = !market.isFavorite;
+  }
+}
+
+function sortBy(column) {
+  if (sortColumn.value === column) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortColumn.value = column;
+    sortDirection.value = 'desc';
+  }
+}
+
+// --- Metadatos de la página (SEO) ---
+// Opcional: Define el título y la descripción de la página
+useHead({
+  title: 'CryptoEx - Mercados'
+})
+</script>
+
 <template>
-  <div class="container markets-container">
-    <h1>Mercados Disponibles</h1>
+  <div class="bg-gray-900 text-white pb-20 md:pb-0 min-h-screen w-full">
+
     
-    <!-- Filtros y Búsqueda -->
-    <div class="filters-section">
-      <div class="row align-items-center">
-        <div class="col-md-6">
-          <div class="input-group">
-            <span class="input-group-text"><i class="bi bi-search"></i></span>
-            <input 
-              type="text" 
-              class="form-control" 
-              placeholder="Buscar mercado..." 
-              v-model="searchQuery"
-            >
+
+    <div class="px-4 py-4">
+      <div class="mb-4">
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none"
+            stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <input v-model="searchQuery" type="text" placeholder="Buscar moneda..."
+            class="w-full bg-gray-800 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500">
+        </div>
+      </div>
+
+      <div class="flex gap-2 overflow-x-auto scrollbar-hide mb-4">
+        <button @click="selectedCategory = 'all'"
+          :class="selectedCategory === 'all' ? 'bg-yellow-500 text-gray-900' : 'bg-gray-800 text-gray-300'"
+          class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
+          Todos
+        </button>
+        <button @click="selectedCategory = 'favorites'"
+          :class="selectedCategory === 'favorites' ? 'bg-yellow-500 text-gray-900' : 'bg-gray-800 text-gray-300'"
+          class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
+          ⭐ Favoritos
+        </button>
+        <button @click="selectedCategory = 'spot'"
+          :class="selectedCategory === 'spot' ? 'bg-yellow-500 text-gray-900' : 'bg-gray-800 text-gray-300'"
+          class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
+          Spot
+        </button>
+        <button @click="selectedCategory = 'defi'"
+          :class="selectedCategory === 'defi' ? 'bg-yellow-500 text-gray-900' : 'bg-gray-800 text-gray-300'"
+          class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
+          DeFi
+        </button>
+        <button @click="selectedCategory = 'gainers'"
+          :class="selectedCategory === 'gainers' ? 'bg-yellow-500 text-gray-900' : 'bg-gray-800 text-gray-300'"
+          class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
+          🔥 Top Ganadores
+        </button>
+        <button @click="selectedCategory = 'losers'"
+          :class="selectedCategory === 'losers' ? 'bg-yellow-500 text-gray-900' : 'bg-gray-800 text-gray-300'"
+          class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
+          📉 Top Perdedores
+        </button>
+      </div>
+
+      <div class="md:hidden space-y-2">
+        <NuxtLink v-for="market in filteredMarkets" :key="market.symbol"
+          :to="`/trade/${market.symbol.replace('/', '_')}`"
+          class="bg-gray-800 rounded-lg p-3 hover:bg-gray-750 cursor-pointer block">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <svg @click.stop="toggleFavorite(market.symbol)" class="w-4 h-4 star-icon"
+                :class="{ 'active': market.isFavorite }" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
+                </path>
+              </svg>
+              <span class="font-semibold">{{ market.symbol }}</span>
+              <span class="text-xs text-gray-400">{{ market.name }}</span>
+            </div>
+            <div class="text-right">
+              <div class="font-semibold">${{ market.price }}</div>
+              <div class="text-xs" :class="market.change >= 0 ? 'price-up' : 'price-down'">
+                {{ market.change >= 0 ? '+' : '' }}{{ market.change }}%
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="col-md-6 text-md-end mt-3 mt-md-0">
-          <div class="btn-group" role="group">
-            <button 
-              v-for="filter in filters" 
-              :key="filter.value" 
-              type="button" 
-              class="btn" 
-              :class="activeFilter === filter.value ? 'btn-primary' : 'btn-outline-light'"
-              @click="activeFilter = filter.value"
-            >
-              {{ filter.label }}
-            </button>
+          <div class="grid grid-cols-3 gap-2 text-xs text-gray-400">
+            <div>
+              <div>24h Alto</div>
+              <div class="text-white">${{ market.high24h }}</div>
+            </div>
+            <div>
+              <div>24h Bajo</div>
+              <div class="text-white">${{ market.low24h }}</div>
+            </div>
+            <div>
+              <div>Vol 24h</div>
+              <div class="text-white">{{ market.volume24h }}M</div>
+            </div>
           </div>
-        </div>
+        </NuxtLink>
       </div>
-    </div>
-    
-    <!-- Tabla de Mercados -->
-    <div class="markets-table-container">
-      <div v-if="loading" class="text-center p-5">
-        <div class="spinner-border text-light" role="status">
-          <span class="visually-hidden">Cargando...</span>
-        </div>
-      </div>
-      
-      <div v-else-if="filteredMarkets.length === 0" class="no-markets">
-        <p>No se encontraron mercados que coincidan con tu búsqueda.</p>
-      </div>
-      
-      <div v-else class="table-responsive">
-        <table class="table custom-table">
-          <thead>
-            <tr>
-              <th @click="sortBy('name')">Par
-                <i v-if="sortKey === 'name'" class="bi" :class="sortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down'"></i>
+
+      <div class="hidden md:block bg-gray-800 rounded-lg overflow-hidden">
+        <table class="w-full">
+          <thead class="bg-gray-750 border-b border-gray-700">
+            <tr class="text-xs text-gray-400">
+              <th class="text-left py-3 px-4 font-normal">Par</th>
+              <th class="text-right py-3 px-4 font-normal cursor-pointer hover:text-white" @click="sortBy('price')">
+                Precio
+                <span v-if="sortColumn === 'price'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
               </th>
-              <th @click="sortBy('last_price')">Último Precio
-                <i v-if="sortKey === 'last_price'" class="bi" :class="sortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down'"></i>
+              <th class="text-right py-3 px-4 font-normal cursor-pointer hover:text-white" @click="sortBy('change')">
+                24h Cambio
+                <span v-if="sortColumn === 'change'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
               </th>
-              <th @click="sortBy('change_24h')">Cambio 24h
-                <i v-if="sortKey === 'change_24h'" class="bi" :class="sortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down'"></i>
+              <th class="text-right py-3 px-4 font-normal">24h Alto</th>
+              <th class="text-right py-3 px-4 font-normal">24h Bajo</th>
+              <th class="text-right py-3 px-4 font-normal cursor-pointer hover:text-white" @click="sortBy('volume24h')">
+                24h Volumen
+                <span v-if="sortColumn === 'volume24h'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
               </th>
-              <th @click="sortBy('high_24h')">Máximo 24h
-                <i v-if="sortKey === 'high_24h'" class="bi" :class="sortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down'"></i>
-              </th>
-              <th @click="sortBy('low_24h')">Mínimo 24h
-                <i v-if="sortKey === 'low_24h'" class="bi" :class="sortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down'"></i>
-              </th>
-              <th @click="sortBy('volume_24h')">Volumen 24h
-                <i v-if="sortKey === 'volume_24h'" class="bi" :class="sortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down'"></i>
-              </th>
-              <th>Acciones</th>
+              <th class="text-center py-3 px-4 font-normal">Acción</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="market in filteredMarkets" :key="market.id">
-              <td>
-                <div class="market-name">
-                  <span class="market-icon" :style="{ backgroundColor: getCurrencyColor(market.base_currency) }">
-                    {{ market.base_currency.substring(0, 1) }}
-                  </span>
-                  <span>{{ market.base_currency }}/{{ market.quote_currency }}</span>
+            <tr v-for="market in filteredMarkets" :key="market.symbol"
+              class="border-b border-gray-700 hover:bg-gray-750 cursor-pointer">
+              <td class="py-4 px-4">
+                <div class="flex items-center gap-2">
+                  <svg @click.stop="toggleFavorite(market.symbol)" class="w-4 h-4 star-icon"
+                    :class="{ 'active': market.isFavorite }" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
+                    </path>
+                  </svg>
+                  <div>
+                    <div class="font-semibold text-sm">{{ market.symbol }}</div>
+                    <div class="text-xs text-gray-400">{{ market.name }}</div>
+                  </div>
                 </div>
               </td>
-              <td>{{ formatPrice(market.last_price) }}</td>
-              <td :class="market.change_24h >= 0 ? 'text-success' : 'text-danger'">
-                {{ formatPercentage(market.change_24h) }}
+              <td class="py-4 px-4 text-right font-semibold">${{ market.price }}</td>
+              <td class="py-4 px-4 text-right font-semibold" :class="market.change >= 0 ? 'price-up' : 'price-down'">
+                {{ market.change >= 0 ? '+' : '' }}{{ market.change }}%
               </td>
-              <td>{{ formatPrice(market.high_24h) }}</td>
-              <td>{{ formatPrice(market.low_24h) }}</td>
-              <td>{{ formatVolume(market.volume_24h) }}</td>
-              <td>
-                <NuxtLink :to="`/trade/${market.name}`" class="btn btn-primary btn-sm">
-                  Operar
+              <td class="py-4 px-4 text-right text-gray-300">${{ market.high24h }}</td>
+              <td class="py-4 px-4 text-right text-gray-300">${{ market.low24h }}</td>
+              <td class="py-4 px-4 text-right text-gray-300">{{ market.volume24h }}M</td>
+              <td class="py-4 px-4 text-center">
+                <NuxtLink :to="`/trade/${market.symbol.replace('/', '_')}`">
+                  <button class="bg-green-500 hover:bg-green-600 text-white text-xs px-4 py-1.5 rounded font-semibold">
+                    Operar
+                  </button>
                 </NuxtLink>
               </td>
             </tr>
@@ -97,323 +259,143 @@
         </table>
       </div>
     </div>
-    
-    <!-- Estadísticas del Mercado -->
-    <div class="market-stats">
-      <div class="row">
-        <div class="col-md-4">
-          <div class="stats-card">
-            <h3>Mercados Activos</h3>
-            <div class="stats-value">{{ markets.length }}</div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="stats-card">
-            <h3>Volumen Total 24h</h3>
-            <div class="stats-value">{{ formatVolume(totalVolume) }} USDT</div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="stats-card">
-            <h3>Mercado Más Activo</h3>
-            <div class="stats-value">{{ mostActiveMarket }}</div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted } from 'vue';
-import { useAuth } from '~/composables/useAuth';
-import axios from '~/plugins/axios';
-
-// Usar el composable de autenticación
-const { isAuthenticated } = useAuth();
-
-// Estado para los mercados
-const markets = ref([]);
-const loading = ref(true);
-const searchQuery = ref('');
-const activeFilter = ref('all');
-const sortKey = ref('volume_24h');
-const sortDirection = ref('desc');
-
-// Filtros disponibles
-const filters = [
-  { label: 'Todos', value: 'all' },
-  { label: 'USDT', value: 'USDT' },
-  { label: 'BTC', value: 'BTC' },
-  { label: 'ETH', value: 'ETH' }
-];
-
-// Colores para las monedas
-const currencyColors = {
-  BTC: '#f7931a',
-  ETH: '#627eea',
-  BSC: '#f0b90b',
-  USDT: '#26a17b',
-  XRP: '#00aae4'
-};
-
-// Filtrar y ordenar mercados
-const filteredMarkets = computed(() => {
-  let result = [...markets.value];
-  
-  // Aplicar filtro por moneda base o cotización
-  if (activeFilter.value !== 'all') {
-    result = result.filter(market => 
-      market.base_currency === activeFilter.value || 
-      market.quote_currency === activeFilter.value
-    );
-  }
-  
-  // Aplicar búsqueda
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase();
-    result = result.filter(market => 
-      market.name.toLowerCase().includes(query) ||
-      market.base_currency.toLowerCase().includes(query) ||
-      market.quote_currency.toLowerCase().includes(query)
-    );
-  }
-  
-  // Ordenar resultados
-  result.sort((a, b) => {
-    let valA = a[sortKey.value];
-    let valB = b[sortKey.value];
-    
-    // Manejar ordenamiento de strings
-    if (typeof valA === 'string') {
-      valA = valA.toLowerCase();
-      valB = valB.toLowerCase();
-    }
-    
-    if (sortDirection.value === 'asc') {
-      return valA > valB ? 1 : -1;
-    } else {
-      return valA < valB ? 1 : -1;
-    }
-  });
-  
-  return result;
-});
-
-// Calcular volumen total
-const totalVolume = computed(() => {
-  return markets.value.reduce((total, market) => total + market.volume_24h, 0);
-});
-
-// Determinar el mercado más activo
-const mostActiveMarket = computed(() => {
-  if (markets.value.length === 0) return 'N/A';
-  
-  const market = [...markets.value].sort((a, b) => b.volume_24h - a.volume_24h)[0];
-  return `${market.base_currency}/${market.quote_currency}`;
-});
-
-// Función para formatear precios
-function formatPrice(price) {
-  return new Intl.NumberFormat('es-ES', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 8
-  }).format(price);
+<style >
+/* He copiado todos tus estilos personalizados.
+  No les he puesto 'scoped' para que las reglas de 'light-mode' 
+  puedan aplicarse correctamente desde tu layout (que es donde
+  probablemente se añade la clase '.light-mode' al <body> o <html>).
+*/
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-// Función para formatear porcentajes
-function formatPercentage(value) {
-  return `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
+
+
+.price-up {
+  color: #0ecb81;
 }
 
-// Función para formatear volumen
-function formatVolume(volume) {
-  return new Intl.NumberFormat('es-ES', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(volume);
+.price-down {
+  color: #f6465d;
 }
 
-// Función para obtener color de la moneda
-function getCurrencyColor(currency) {
-  return currencyColors[currency] || '#00ff00';
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
-// Función para cambiar el ordenamiento
-function sortBy(key) {
-  if (sortKey.value === key) {
-    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
-  } else {
-    sortKey.value = key;
-    sortDirection.value = 'asc';
-  }
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-// Función para obtener los mercados
-async function fetchMarkets() {
-  loading.value = true;
-  try {
-    const response = await axios.get('/api/markets');
-    
-    // Agregar datos de ejemplo para la visualización
-    markets.value = response.data.map(market => ({
-      ...market,
-      last_price: market.last_price || Math.random() * 50000,
-      change_24h: market.change_24h || (Math.random() * 10 - 5),
-      high_24h: market.high_24h || Math.random() * 55000,
-      low_24h: market.low_24h || Math.random() * 45000,
-      volume_24h: market.volume_24h || Math.random() * 1000000
-    }));
-  } catch (error) {
-    console.error('Error al obtener mercados:', error);
-    
-    // Datos de ejemplo en caso de error
-    markets.value = [
-      { id: 1, name: 'BTC_USDT', base_currency: 'BTC', quote_currency: 'USDT', last_price: 50245.32, change_24h: 2.5, high_24h: 51000, low_24h: 49500, volume_24h: 1245678.45 },
-      { id: 2, name: 'ETH_USDT', base_currency: 'ETH', quote_currency: 'USDT', last_price: 3245.67, change_24h: 1.8, high_24h: 3300, low_24h: 3200, volume_24h: 987654.32 },
-      { id: 3, name: 'BSC_USDT', base_currency: 'BSC', quote_currency: 'USDT', last_price: 412.89, change_24h: -0.7, high_24h: 420, low_24h: 410, volume_24h: 456789.12 }
-    ];
-  } finally {
-    loading.value = false;
-  }
+/* Light Mode */
+.light-mode {
+  background-color: #f5f5f5;
+  color: #1a1a1a;
 }
 
-// Cargar datos al montar el componente
-onMounted(async () => {
-  await fetchMarkets();
-});
-</script>
-
-<style scoped>
-.markets-container {
-  padding: 2rem 0;
+.light-mode .bg-gray-900 {
+  background-color: #f5f5f5 !important;
 }
 
-.markets-container h1 {
-  color: #00ff00;
-  margin-bottom: 2rem;
+.light-mode .bg-gray-800 {
+  background-color: #ffffff !important;
+  border: 1px solid #e5e5e5;
 }
 
-/* Estilos para la sección de filtros */
-.filters-section {
-  margin-bottom: 2rem;
+.light-mode .bg-gray-700 {
+  background-color: #f8f8f8 !important;
 }
 
-.input-group-text {
-  background-color: #333;
-  border-color: #444;
-  color: #00ff00;
+.light-mode .bg-gray-750 {
+  background-color: #f0f0f0 !important;
 }
 
-.form-control {
-  background-color: #333;
-  border-color: #444;
-  color: #ffffff;
+.light-mode .text-white {
+  color: #1a1a1a !important;
 }
 
-.form-control:focus {
-  background-color: #333;
-  border-color: #00ff00;
-  color: #ffffff;
-  box-shadow: 0 0 0 0.25rem rgba(0, 255, 0, 0.25);
+.light-mode .text-gray-300 {
+  color: #666666 !important;
 }
 
-/* Estilos para la tabla de mercados */
-.markets-table-container {
-  background-color: #1e1e1e;
-  border-radius: 10px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
+.light-mode .text-gray-400 {
+  color: #999999 !important;
 }
 
-.custom-table {
-  color: white;
+.light-mode .text-gray-500 {
+  color: #aaaaaa !important;
 }
 
-.custom-table thead th {
-  color: #fff;
-  background-color: #444;
-  border-bottom: none;
-  cursor: pointer;
-  user-select: none;
+.light-mode .border-gray-700 {
+  border-color: #e5e5e5 !important;
+}
+
+.light-mode .hover\:bg-gray-600:hover {
+  background-color: #e8e8e8 !important;
+}
+
+.light-mode .hover\:bg-gray-700:hover {
+  background-color: #f0f0f0 !important;
+}
+
+.light-mode .hover\:bg-gray-750:hover {
+  background-color: #f5f5f5 !important;
+}
+
+/* Toggle Switch */
+/* Estos estilos estaban en el original. Es probable que tu layout 
+  ya tenga su propio 'toggle', pero los mantengo por si acaso.
+*/
+.toggle-switch {
   position: relative;
+  width: 48px;
+  height: 24px;
+  background-color: #4b5563;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-.custom-table thead th:hover {
-  background-color: #555;
+.toggle-switch.active {
+  background-color: #fbbf24;
 }
 
-.custom-table thead th i {
-  margin-left: 5px;
-  font-size: 0.8rem;
-}
-
-.custom-table tbody tr {
-  background-color: #222;
-}
-
-.custom-table tbody tr:nth-child(even) {
-  background-color: #333;
-}
-
-.custom-table tbody td {
-  color: white;
-  vertical-align: middle;
-}
-
-.market-name {
-  display: flex;
-  align-items: center;
-}
-
-.market-icon {
-  width: 30px;
-  height: 30px;
+.toggle-slider {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: white;
   border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-right: 10px;
-  font-weight: bold;
-  color: #000;
+  transition: transform 0.3s;
 }
 
-.text-success {
-  color: #00ff00 !important;
+.toggle-switch.active .toggle-slider {
+  transform: translateX(24px);
 }
 
-.text-danger {
-  color: #ff0000 !important;
+/* Star Icon */
+.star-icon {
+  cursor: pointer;
+  transition: color 0.2s;
 }
 
-.no-markets {
-  text-align: center;
-  padding: 3rem;
-  color: #cccccc;
+.star-icon.active {
+  color: #fbbf24;
 }
 
-/* Estilos para las estadísticas del mercado */
-.market-stats {
-  margin-top: 3rem;
+.star-icon:not(.active) {
+  color: #6b7280;
 }
 
-.stats-card {
-  background-color: #1e1e1e;
-  border-radius: 10px;
-  padding: 1.5rem;
-  height: 100%;
-  text-align: center;
-}
-
-.stats-card h3 {
-  color: #cccccc;
-  font-size: 1rem;
-  margin-bottom: 1rem;
-}
-
-.stats-value {
-  font-size: 1.8rem;
-  font-weight: bold;
-  color: #00ff00;
+.star-icon:hover {
+  color: #fbbf24;
 }
 </style>

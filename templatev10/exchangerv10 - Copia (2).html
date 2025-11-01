@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="es" style="height: 100%;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoEx - Trading</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+    <script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; transition: background-color 0.3s, color 0.3s; }
+        .price-up { color: #0ecb81; }
+        .price-down { color: #f6465d; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Light Mode */
+        .light-mode { background-color: #f5f5f5; color: #1a1a1a; }
+        .light-mode .bg-gray-900 { background-color: #f5f5f5 !important; }
+        .light-mode .bg-gray-800 { background-color: #ffffff !important; border: 1px solid #e5e5e5; }
+        .light-mode .bg-gray-700 { background-color: #f8f8f8 !important; }
+        .light-mode .bg-gray-750 { background-color: #f0f0f0 !important; }
+        .light-mode .text-white { color: #1a1a1a !important; }
+        .light-mode .text-gray-300 { color: #666666 !important; }
+        .light-mode .text-gray-400 { color: #999999 !important; }
+        .light-mode .text-gray-500 { color: #aaaaaa !important; }
+        .light-mode .border-gray-700 { border-color: #e5e5e5 !important; }
+        .light-mode .hover\:bg-gray-600:hover { background-color: #e8e8e8 !important; }
+        .light-mode .hover\:bg-gray-700:hover { background-color: #f0f0f0 !important; }
+        .light-mode .hover\:bg-gray-750:hover { background-color: #f5f5f5 !important; }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background-color: #4b5563;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .toggle-switch.active {
+            background-color: #fbbf24;
+        }
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(24px);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white h-full" :class="{'light-mode': isLightMode}">
+    <div id="app" class="h-full">
+        <!-- Header -->
+        <header class="bg-gray-800 border-b border-gray-700 sticky top-0 z-50">
+            <div class="px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <h1 class="text-xl font-bold text-yellow-400">CryptoEx</h1>
+                    <div class="hidden md:flex gap-4 text-sm">
+                        <a href="#" class="text-gray-300 hover:text-white">Mercados</a>
+                        <a href="#" class="text-white font-semibold">Trading</a>
+                        <a href="#" class="text-gray-300 hover:text-white">Futuros</a>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <!-- Theme Toggle -->
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                        </svg>
+                        <div @click="toggleTheme" class="toggle-switch" :class="{'active': isLightMode}">
+                            <div class="toggle-slider"></div>
+                        </div>
+                        <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <button class="text-xs px-3 py-1.5 bg-gray-700 rounded hover:bg-gray-600 hidden sm:block">Depositar</button>
+                    <button class="text-xs px-3 py-1.5 bg-yellow-500 text-gray-900 rounded font-semibold hover:bg-yellow-400">Registrarse</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Wrapper -->
+        <div class="container mx-auto max-w-screen-xl px-6 flex-grow">
+            <!-- Trading Pair Info -->
+            <div class="bg-gray-800 border-b border-gray-700 rounded-lg p-4 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-2xl font-bold">{{ currentPair.symbol }}</h2>
+                    <span class="text-sm text-gray-400">{{ currentPair.name }}</span>
+                </div>
+                <button class="text-gray-400 hover:text-white p-2 rounded-full hover:bg-gray-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="flex items-end gap-4 mb-4">
+                <div class="text-4xl font-bold" :class="priceChange >= 0 ? 'price-up' : 'price-down'">
+                    ${{ currentPair.price }}
+                </div>
+                <div class="text-base pb-1" :class="priceChange >= 0 ? 'price-up' : 'price-down'">
+                    {{ priceChange >= 0 ? '+' : '' }}{{ priceChange }}%
+                </div>
+            </div>
+            <div class="grid grid-cols-3 gap-4 text-sm">
+                <div>
+                    <div class="text-gray-400">24h Alto</div>
+                    <div class="font-semibold">${{ currentPair.high24h }}</div>
+                </div>
+                <div>
+                    <div class="text-gray-400">24h Bajo</div>
+                    <div class="font-semibold">${{ currentPair.low24h }}</div>
+                </div>
+                <div>
+                    <div class="text-gray-400">24h Vol</div>
+                    <div class="font-semibold">{{ currentPair.volume24h }}M</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart Placeholder -->
+        <div class="bg-gray-900 rounded-lg p-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Chart - 2/3 width -->
+                <div class="col-span-full md:col-span-2 bg-gray-800 rounded-lg p-4">
+                    <div ref="chartContainer" class="w-full h-full"></div>
+                </div>
+
+
+
+                <!-- Order Book - 1/3 width -->
+                <div class="col-span-full md:col-span-1 bg-gray-800 rounded-lg p-4 flex flex-col">
+                    <div class="flex border-b border-gray-700 mb-3 pb-2">
+                        <button @click="activeTab = 'orderbook'" 
+                                :class="activeTab === 'orderbook' ? 'text-white font-semibold' : 'text-gray-400'"
+                                class="px-3 py-1 text-sm">
+                            Libro
+                        </button>
+                        <button @click="activeTab = 'trades'" 
+                                :class="activeTab === 'trades' ? 'text-white font-semibold' : 'text-gray-400'"
+                                class="px-3 py-1 text-sm">
+                            Operaciones
+                        </button>
+                    </div>
+
+                    <div v-if="activeTab === 'orderbook'" class="flex-1 overflow-y-auto scrollbar-hide">
+                        <div class="flex justify-between text-xs text-gray-400 mb-2 sticky top-0 bg-gray-800 pb-1">
+                            <span>Precio(USDT)</span>
+                            <span>Cantidad</span>
+                        </div>
+                        <div class="space-y-0.5">
+                            <div v-for="order in orderBook.asks.slice(0, 10).reverse()" :key="'desktop-ask-' + order.price" 
+                                 class="flex justify-between text-xs text-red-400 hover:bg-gray-700 px-1 py-0.5 rounded cursor-pointer">
+                                <span>{{ order.price }}</span>
+                                <span class="text-gray-300">{{ order.amount }}</span>
+                            </div>
+                            <div class="py-2 text-center font-bold text-base my-1 bg-gray-750 rounded">
+                                <span :class="priceChange >= 0 ? 'price-up' : 'price-down'">{{ currentPair.price }}</span>
+                            </div>
+                            <div v-for="order in orderBook.bids.slice(0, 10)" :key="'desktop-bid-' + order.price" 
+                                 class="flex justify-between text-xs text-green-400 hover:bg-gray-700 px-1 py-0.5 rounded cursor-pointer">
+                                <span>{{ order.price }}</span>
+                                <span class="text-gray-300">{{ order.amount }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="activeTab === 'trades'" class="flex-1 overflow-y-auto scrollbar-hide">
+                        <div class="flex justify-between text-xs text-gray-400 mb-2 sticky top-0 bg-gray-800 pb-1">
+                            <span>Precio</span>
+                            <span>Cantidad</span>
+                            <span>Hora</span>
+                        </div>
+                        <div class="space-y-0.5">
+                            <div v-for="trade in recentTrades" :key="'desktop-trade-' + trade.time" 
+                                 class="flex justify-between text-xs hover:bg-gray-700 px-1 py-0.5 rounded cursor-pointer"
+                                 :class="trade.side === 'buy' ? 'text-green-400' : 'text-red-400'">
+                                <span>{{ trade.price }}</span>
+                                <span class="text-gray-300">{{ trade.amount }}</span>
+                                <span class="text-gray-400 text-xs">{{ trade.time }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Mobile Tabs: Order Book / Chart -->
+        <div class="md:hidden bg-gray-800 border-b border-gray-700">
+            <div class="flex">
+                <button @click="mobileView = 'orderbook'" 
+                        :class="mobileView === 'orderbook' ? 'border-yellow-400 text-white' : 'text-gray-400 border-transparent'"
+                        class="flex-1 px-4 py-3 text-sm font-semibold border-b-2">
+                    Libro de Órdenes
+                </button>
+                <button @click="mobileView = 'chart'" 
+                        :class="mobileView === 'chart' ? 'border-yellow-400 text-white' : 'text-gray-400 border-transparent'"
+                        class="flex-1 px-4 py-3 text-sm font-semibold border-b-2">
+                    Gráfico
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Tabs: Order Book / Chart -->
+        <div class="md:hidden bg-gray-800 border-b border-gray-700">
+            <div class="flex">
+                <button @click="mobileView = 'orderbook'" 
+                        :class="mobileView === 'orderbook' ? 'border-yellow-400 text-white' : 'text-gray-400 border-transparent'"
+                        class="flex-1 px-4 py-3 text-sm font-semibold border-b-2">
+                    Libro de Órdenes
+                </button>
+                <button @click="mobileView = 'chart'" 
+                        :class="mobileView === 'chart' ? 'border-yellow-400 text-white' : 'text-gray-400 border-transparent'"
+                        class="flex-1 px-4 py-3 text-sm font-semibold border-b-2">
+                    Gráfico
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Order Book / Chart Content -->
+        <div class="md:hidden bg-gray-900 flex-grow h-full">
+            <!-- Order Book View -->
+            <div v-if="mobileView === 'orderbook'" class="px-4 py-4">
+                <div class="bg-gray-800 rounded-lg p-4">
+                    <div class="flex justify-between text-xs text-gray-400 mb-2">
+                        <span>Precio(USDT)</span>
+                        <span>Cantidad</span>
+                        <span>Total</span>
+                    </div>
+                    <div class="space-y-1">
+                        <div v-for="order in orderBook.asks.slice(0, 6)" :key="'mobile-ask-' + order.price" 
+                             class="flex justify-between text-xs text-red-400">
+                            <span>{{ order.price }}</span>
+                            <span class="text-gray-300">{{ order.amount }}</span>
+                            <span class="text-gray-400">{{ order.total }}</span>
+                        </div>
+                        <div class="py-2 text-center font-bold text-lg">
+                            {{ currentPair.price }}
+                        </div>
+                        <div v-for="order in orderBook.bids.slice(0, 6)" :key="'mobile-bid-' + order.price" 
+                             class="flex justify-between text-xs text-green-400">
+                            <span>{{ order.price }}</span>
+                            <span class="text-gray-300">{{ order.amount }}</span>
+                            <span class="text-gray-400">{{ order.total }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart View -->
+            <div v-if="mobileView === 'chart'" class="flex-grow h-full">
+                <div class="bg-gray-800 rounded-lg p-4 min-h-64 flex items-center justify-center h-full">
+                    <div ref="chartContainer" class="w-full h-full"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trading Panel -->
+        <div class="px-4 pb-20">
+            <div class="grid md:grid-cols-2 gap-4">
+                <!-- Buy Panel -->
+                <div class="bg-gray-800 rounded-lg p-4">
+                    <div class="flex justify-between mb-4">
+                        <button @click="tradeType = 'limit'" 
+                                :class="tradeType === 'limit' ? 'text-white font-semibold' : 'text-gray-400'"
+                                class="text-sm">Límite</button>
+                        <button @click="tradeType = 'market'" 
+                                :class="tradeType === 'market' ? 'text-white font-semibold' : 'text-gray-400'"
+                                class="text-sm">Mercado</button>
+                        <button class="text-gray-400 text-sm">Stop-Limit</button>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-gray-400 block mb-1">Precio</label>
+                            <input v-model="buyPrice" type="number" 
+                                   :disabled="tradeType === 'market'"
+                                   class="w-full bg-gray-700 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
+                                   :placeholder="tradeType === 'market' ? 'Mercado' : currentPair.price">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-400 block mb-1">Cantidad</label>
+                            <input v-model="buyAmount" type="number" 
+                                   class="w-full bg-gray-700 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
+                                   placeholder="0.00">
+                        </div>
+                        <div class="flex gap-2">
+                            <button @click="buyAmount = balance * 0.25" class="flex-1 bg-gray-700 rounded py-1 text-xs hover:bg-gray-600">25%</button>
+                            <button @click="buyAmount = balance * 0.50" class="flex-1 bg-gray-700 rounded py-1 text-xs hover:bg-gray-600">50%</button>
+                            <button @click="buyAmount = balance * 0.75" class="flex-1 bg-gray-700 rounded py-1 text-xs hover:bg-gray-600">75%</button>
+                            <button @click="buyAmount = balance" class="flex-1 bg-gray-700 rounded py-1 text-xs hover:bg-gray-600">100%</button>
+                        </div>
+                        <div class="text-xs text-gray-400">
+                            <div class="flex justify-between">
+                                <span>Disponible</span>
+                                <span>{{ balance.toFixed(2) }} USDT</span>
+                            </div>
+                        </div>
+                        <button class="w-full bg-green-500 hover:bg-green-600 rounded py-3 font-semibold text-sm">
+                            Comprar {{ currentPair.base }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sell Panel -->
+                <div class="bg-gray-800 rounded-lg p-4">
+                    <div class="flex justify-between mb-4">
+                        <button @click="tradeType = 'limit'" 
+                                :class="tradeType === 'limit' ? 'text-white font-semibold' : 'text-gray-400'"
+                                class="text-sm">Límite</button>
+                        <button @click="tradeType = 'market'" 
+                                :class="tradeType === 'market' ? 'text-white font-semibold' : 'text-gray-400'"
+                                class="text-sm">Mercado</button>
+                        <button class="text-gray-400 text-sm">Stop-Limit</button>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-gray-400 block mb-1">Precio</label>
+                            <input v-model="sellPrice" type="number" 
+                                   :disabled="tradeType === 'market'"
+                                   class="w-full bg-gray-700 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-red-500"
+                                   :placeholder="tradeType === 'market' ? 'Mercado' : currentPair.price">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-400 block mb-1">Cantidad</label>
+                            <input v-model="sellAmount" type="number" 
+                                   class="w-full bg-gray-700 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-red-500"
+                                   placeholder="0.00">
+                        </div>
+                        <div class="flex gap-2">
+                            <button @click="sellAmount = cryptoBalance * 0.25" class="flex-1 bg-gray-700 rounded py-1 text-xs hover:bg-gray-600">25%</button>
+                            <button @click="sellAmount = cryptoBalance * 0.50" class="flex-1 bg-gray-700 rounded py-1 text-xs hover:bg-gray-600">50%</button>
+                            <button @click="sellAmount = cryptoBalance * 0.75" class="flex-1 bg-gray-700 rounded py-1 text-xs hover:bg-gray-600">75%</button>
+                            <button @click="sellAmount = cryptoBalance" class="flex-1 bg-gray-700 rounded py-1 text-xs hover:bg-gray-600">100%</button>
+                        </div>
+                        <div class="text-xs text-gray-400">
+                            <div class="flex justify-between">
+                                <span>Disponible</span>
+                                <span>{{ cryptoBalance.toFixed(6) }} {{ currentPair.base }}</span>
+                            </div>
+                        </div>
+                        <button class="w-full bg-red-500 hover:bg-red-600 rounded py-3 font-semibold text-sm">
+                            Vender {{ currentPair.base }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Open Orders / History - Desktop & Mobile -->
+            <div class="mt-4 bg-gray-800 rounded-lg p-4">
+                <div class="flex border-b border-gray-700 mb-3">
+                    <button @click="ordersTab = 'open'" 
+                            :class="ordersTab === 'open' ? 'border-yellow-400 text-white' : 'text-gray-400'"
+                            class="px-4 py-2 text-sm font-semibold border-b-2 border-transparent">
+                        Órdenes Abiertas ({{ openOrders.length }})
+                    </button>
+                    <button @click="ordersTab = 'history'" 
+                            :class="ordersTab === 'history' ? 'border-yellow-400 text-white' : 'text-gray-400'"
+                            class="px-4 py-2 text-sm font-semibold border-b-2 border-transparent">
+                        Historial
+                    </button>
+                </div>
+
+                <!-- Open Orders -->
+                <div v-if="ordersTab === 'open'">
+                    <div v-if="openOrders.length === 0" class="text-center py-8 text-gray-400">
+                        <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <p class="text-sm">No tienes órdenes abiertas</p>
+                    </div>
+                    
+                    <div v-else>
+                        <!-- Desktop Table -->
+                        <div class="hidden md:block overflow-x-auto">
+                            <table class="w-full text-xs">
+                                <thead class="text-gray-400 border-b border-gray-700">
+                                    <tr>
+                                        <th class="text-left py-2 font-normal">Fecha</th>
+                                        <th class="text-left py-2 font-normal">Par</th>
+                                        <th class="text-left py-2 font-normal">Tipo</th>
+                                        <th class="text-left py-2 font-normal">Lado</th>
+                                        <th class="text-right py-2 font-normal">Precio</th>
+                                        <th class="text-right py-2 font-normal">Cantidad</th>
+                                        <th class="text-right py-2 font-normal">Ejecutado</th>
+                                        <th class="text-right py-2 font-normal">Total</th>
+                                        <th class="text-center py-2 font-normal">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="order in openOrders" :key="order.id" class="border-b border-gray-700 hover:bg-gray-750">
+                                        <td class="py-3 text-gray-300">{{ order.date }}</td>
+                                        <td class="py-3">{{ order.pair }}</td>
+                                        <td class="py-3 text-gray-300">{{ order.type }}</td>
+                                        <td class="py-3" :class="order.side === 'Compra' ? 'text-green-400' : 'text-red-400'">
+                                            {{ order.side }}
+                                        </td>
+                                        <td class="py-3 text-right text-gray-300">{{ order.price }}</td>
+                                        <td class="py-3 text-right text-gray-300">{{ order.amount }}</td>
+                                        <td class="py-3 text-right text-gray-300">{{ order.filled }}%</td>
+                                        <td class="py-3 text-right text-gray-300">{{ order.total }}</td>
+                                        <td class="py-3 text-center">
+                                            <button @click="cancelOrder(order.id)" class="text-red-400 hover:text-red-300 text-xs px-2 py-1 border border-red-400 rounded hover:bg-red-400 hover:bg-opacity-10">
+                                                Cancelar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Mobile Cards -->
+                        <div class="md:hidden space-y-3">
+                            <div v-for="order in openOrders" :key="order.id" class="bg-gray-700 rounded-lg p-3">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <span class="font-semibold">{{ order.pair }}</span>
+                                        <span class="text-xs text-gray-400 ml-2">{{ order.date }}</span>
+                                    </div>
+                                    <span class="text-xs px-2 py-1 rounded" 
+                                          :class="order.side === 'Compra' ? 'bg-green-500 bg-opacity-20 text-green-400' : 'bg-red-500 bg-opacity-20 text-red-400'">
+                                        {{ order.side }}
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 text-xs mb-3">
+                                    <div>
+                                        <div class="text-gray-400">Precio</div>
+                                        <div class="text-white">{{ order.price }}</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-gray-400">Cantidad</div>
+                                        <div class="text-white">{{ order.amount }}</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-gray-400">Ejecutado</div>
+                                        <div class="text-white">{{ order.filled }}%</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-gray-400">Total</div>
+                                        <div class="text-white">{{ order.total }}</div>
+                                    </div>
+                                </div>
+                                <button @click="cancelOrder(order.id)" class="w-full text-red-400 hover:text-red-300 text-xs py-2 border border-red-400 rounded hover:bg-red-400 hover:bg-opacity-10">
+                                    Cancelar Orden
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History -->
+                <div v-if="ordersTab === 'history'">
+                    <div v-if="orderHistory.length === 0" class="text-center py-8 text-gray-400">
+                        <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p class="text-sm">No hay historial de órdenes</p>
+                    </div>
+
+                    <div v-else>
+                        <!-- Desktop Table -->
+                        <div class="hidden md:block overflow-x-auto">
+                            <table class="w-full text-xs">
+                                <thead class="text-gray-400 border-b border-gray-700">
+                                    <tr>
+                                        <th class="text-left py-2 font-normal">Fecha</th>
+                                        <th class="text-left py-2 font-normal">Par</th>
+                                        <th class="text-left py-2 font-normal">Tipo</th>
+                                        <th class="text-left py-2 font-normal">Lado</th>
+                                        <th class="text-right py-2 font-normal">Precio</th>
+                                        <th class="text-right py-2 font-normal">Cantidad</th>
+                                        <th class="text-right py-2 font-normal">Total</th>
+                                        <th class="text-left py-2 font-normal">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="order in orderHistory" :key="order.id" class="border-b border-gray-700 hover:bg-gray-750">
+                                        <td class="py-3 text-gray-300">{{ order.date }}</td>
+                                        <td class="py-3">{{ order.pair }}</td>
+                                        <td class="py-3 text-gray-300">{{ order.type }}</td>
+                                        <td class="py-3" :class="order.side === 'Compra' ? 'text-green-400' : 'text-red-400'">
+                                            {{ order.side }}
+                                        </td>
+                                        <td class="py-3 text-right text-gray-300">{{ order.price }}</td>
+                                        <td class="py-3 text-right text-gray-300">{{ order.amount }}</td>
+                                        <td class="py-3 text-right text-gray-300">{{ order.total }}</td>
+                                        <td class="py-3">
+                                            <span class="text-xs px-2 py-1 rounded" 
+                                                  :class="order.status === 'Completada' ? 'bg-green-500 bg-opacity-20 text-green-400' : 'bg-gray-500 bg-opacity-20 text-gray-400'">
+                                                {{ order.status }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Mobile Cards -->
+                        <div class="md:hidden space-y-3">
+                            <div v-for="order in orderHistory" :key="order.id" class="bg-gray-700 rounded-lg p-3">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <span class="font-semibold">{{ order.pair }}</span>
+                                        <span class="text-xs text-gray-400 ml-2">{{ order.date }}</span>
+                                    </div>
+                                    <span class="text-xs px-2 py-1 rounded" 
+                                          :class="order.status === 'Completada' ? 'bg-green-500 bg-opacity-20 text-green-400' : 'bg-gray-500 bg-opacity-20 text-gray-400'">
+                                        {{ order.status }}
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="text-xs px-2 py-1 rounded" 
+                                          :class="order.side === 'Compra' ? 'bg-green-500 bg-opacity-20 text-green-400' : 'bg-red-500 bg-opacity-20 text-red-400'">
+                                        {{ order.side }}
+                                    </span>
+                                    <span class="text-xs text-gray-400">{{ order.type }}</span>
+                                </div>
+                                <div class="grid grid-cols-3 gap-2 text-xs">
+                                    <div>
+                                        <div class="text-gray-400">Precio</div>
+                                        <div class="text-white">{{ order.price }}</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-gray-400">Cantidad</div>
+                                        <div class="text-white">{{ order.amount }}</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-gray-400">Total</div>
+                                        <div class="text-white">{{ order.total }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 md:hidden">
+            <div class="flex justify-around py-3">
+                <button class="flex flex-col items-center gap-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    <span class="text-xs text-gray-400">Inicio</span>
+                </button>
+                <button class="flex flex-col items-center gap-1">
+                    <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                    <span class="text-xs text-yellow-400">Trading</span>
+                </button>
+                <button class="flex flex-col items-center gap-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    <span class="text-xs text-gray-400">Wallet</span>
+                </button>
+                <button class="flex flex-col items-center gap-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    <span class="text-xs text-gray-400">Perfil</span>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                currentPair: {
+                    symbol: 'BTC/USDT',
+                    name: 'Bitcoin',
+                    base: 'BTC',
+                    quote: 'USDT',
+                    price: '64,285.50',
+                    high24h: '65,120.00',
+                    low24h: '63,450.00',
+                    volume24h: '2,456'
+                },
+                priceChange: 2.34,
+                balance: 10000,
+                cryptoBalance: 0.5,
+                buyPrice: '',
+                buyAmount: '',
+                sellPrice: '',
+                sellAmount: '',
+                tradeType: 'limit',
+                activeTab: 'orderbook',
+                mobileView: 'orderbook',
+                ordersTab: 'open',
+                isLightMode: false,
+                openOrders: [
+                    {
+                        id: 1,
+                        date: '2025-10-02 14:35',
+                        pair: 'BTC/USDT',
+                        type: 'Límite',
+                        side: 'Compra',
+                        price: '64,250.00',
+                        amount: '0.125',
+                        filled: '0',
+                        total: '8,031.25'
+                    },
+                    {
+                        id: 2,
+                        date: '2025-10-02 14:20',
+                        pair: 'BTC/USDT',
+                        type: 'Límite',
+                        side: 'Venta',
+                        price: '64,500.00',
+                        amount: '0.08',
+                        filled: '0',
+                        total: '5,160.00'
+                    },
+                    {
+                        id: 3,
+                        date: '2025-10-02 13:45',
+                        pair: 'BTC/USDT',
+                        type: 'Límite',
+                        side: 'Compra',
+                        price: '64,100.00',
+                        amount: '0.25',
+                        filled: '30',
+                        total: '16,025.00'
+                    }
+                ],
+                orderHistory: [
+                    {
+                        id: 101,
+                        date: '2025-10-02 12:15',
+                        pair: 'BTC/USDT',
+                        type: 'Mercado',
+                        side: 'Compra',
+                        price: '64,180.50',
+                        amount: '0.05',
+                        total: '3,209.03',
+                        status: 'Completada'
+                    },
+                    {
+                        id: 102,
+                        date: '2025-10-02 10:30',
+                        pair: 'BTC/USDT',
+                        type: 'Límite',
+                        side: 'Venta',
+                        price: '64,350.00',
+                        amount: '0.1',
+                        total: '6,435.00',
+                        status: 'Completada'
+                    },
+                    {
+                        id: 103,
+                        date: '2025-10-02 09:20',
+                        pair: 'BTC/USDT',
+                        type: 'Límite',
+                        side: 'Compra',
+                        price: '63,900.00',
+                        amount: '0.15',
+                        total: '9,585.00',
+                        status: 'Cancelada'
+                    },
+                    {
+                        id: 104,
+                        date: '2025-10-01 18:45',
+                        pair: 'BTC/USDT',
+                        type: 'Mercado',
+                        side: 'Compra',
+                        price: '63,750.00',
+                        amount: '0.2',
+                        total: '12,750.00',
+                        status: 'Completada'
+                    }
+                ],
+                orderBook: {
+                    asks: [
+                        { price: '64,290.50', amount: '0.125', total: '8,036.31' },
+                        { price: '64,295.00', amount: '0.458', total: '29,447.11' },
+                        { price: '64,300.50', amount: '0.892', total: '57,356.05' },
+                        { price: '64,310.00', amount: '1.234', total: '79,358.54' },
+                        { price: '64,320.50', amount: '0.567', total: '36,469.80' },
+                        { price: '64,330.00', amount: '0.234', total: '15,053.22' },
+                        { price: '64,340.50', amount: '0.789', total: '50,784.77' },
+                        { price: '64,350.00', amount: '0.456', total: '29,343.60' }
+                    ],
+                    bids: [
+                        { price: '64,280.00', amount: '0.234', total: '15,041.52' },
+                        { price: '64,275.50', amount: '0.567', total: '36,444.18' },
+                        { price: '64,270.00', amount: '1.123', total: '72,175.21' },
+                        { price: '64,265.50', amount: '0.892', total: '57,324.83' },
+                        { price: '64,260.00', amount: '0.456', total: '29,302.56' },
+                        { price: '64,250.50', amount: '0.789', total: '50,693.64' },
+                        { price: '64,240.00', amount: '1.234', total: '79,272.16' },
+                        { price: '64,230.50', amount: '0.345', total: '22,159.52' }
+                    ]
+                },
+                recentTrades: [
+                    { price: '64,285.50', amount: '0.125', time: '18:45:23', side: 'buy' },
+                    { price: '64,283.00', amount: '0.458', time: '18:45:20', side: 'sell' },
+                    { price: '64,286.50', amount: '0.234', time: '18:45:18', side: 'buy' },
+                    { price: '64,284.00', amount: '0.892', time: '18:45:15', side: 'sell' },
+                    { price: '64,287.50', amount: '0.567', time: '18:45:12', side: 'buy' },
+                    { price: '64,285.00', amount: '0.123', time: '18:45:09', side: 'buy' },
+                    { price: '64,282.50', amount: '0.789', time: '18:45:06', side: 'sell' },
+                    { price: '64,286.00', amount: '0.345', time: '18:45:03', side: 'buy' }
+                ],
+                chart: null,
+                candlestickSeries: null,
+                volumeSeries: null,
+                chartHeight: 400,
+                mobileView: 'orderbook',
+            },
+            mounted() {
+                this.initializeChart();
+                this.generateSampleData();
+                window.addEventListener('resize', this.updateChartSize);
+            },
+            beforeDestroy() {
+                if (this.chart) {
+                    window.removeEventListener('resize', this.updateChartSize);
+                    this.chart.remove();
+                    this.chart = null;
+                }
+            },
+            watch: {
+                isLightMode(newVal) {
+                    if (this.chart) {
+                        const backgroundColor = newVal ? '#ffffff' : '#1a202c';
+                        const textColor = newVal ? '#374151' : '#cbd5e0';
+                        const gridColor = newVal ? '#f3f4f6' : '#2d3748';
+                        const borderColor = newVal ? '#d1d5db' : '#4a5568';
+
+                        this.chart.applyOptions({
+                            layout: {
+                                background: { type: 'solid', color: backgroundColor },
+                                textColor: textColor,
+                            },
+                            grid: {
+                                vertLines: { color: gridColor },
+                                horzLines: { color: gridColor },
+                            },
+                            priceScale: {
+                                borderColor: borderColor,
+                            },
+                            timeScale: {
+                                borderColor: borderColor,
+                            },
+                        });
+
+                        this.candlestickSeries.applyOptions({
+                            upColor: newVal ? '#22c55e' : '#0ecb81',
+                            downColor: newVal ? '#ef4444' : '#ea3943',
+                            borderUpColor: newVal ? '#22c55e' : '#0ecb81',
+                            borderDownColor: newVal ? '#ef4444' : '#ea3943',
+                            wickUpColor: newVal ? '#22c55e' : '#0ecb81',
+                            wickDownColor: newVal ? '#ef4444' : '#ea3943',
+                        });
+
+                        this.volumeSeries.applyOptions({
+                            color: newVal ? '#9ca3af' : '#4a5568',
+                        });
+                    }
+                },
+                mobileView(newVal) {
+                    if (newVal === 'chart') {
+                        this.$nextTick(() => {
+                            if (!this.chart) {
+                                this.initializeChart();
+                                this.generateSampleData();
+                            }
+                        });
+                    }
+                },
+                isLightMode(newVal) {
+                    if (this.chart) {
+                        const backgroundColor = newVal ? '#ffffff' : '#1a202c';
+                        const textColor = newVal ? '#374151' : '#cbd5e0';
+                        const gridColor = newVal ? '#f3f4f6' : '#2d3748';
+                        const borderColor = newVal ? '#d1d5db' : '#4a5568';
+
+                        this.chart.applyOptions({
+                            layout: {
+                                background: { type: 'solid', color: backgroundColor },
+                                textColor: textColor,
+                            },
+                            grid: {
+                                vertLines: { color: gridColor },
+                                horzLines: { color: gridColor },
+                            },
+                            priceScale: {
+                                borderColor: borderColor,
+                            },
+                            timeScale: {
+                                borderColor: borderColor,
+                            },
+                        });
+
+                        this.candlestickSeries.applyOptions({
+                            upColor: newVal ? '#22c55e' : '#0ecb81',
+                            downColor: newVal ? '#ef4444' : '#f6465d',
+                            borderDownColor: newVal ? '#ef4444' : '#f6465d',
+                            borderUpColor: newVal ? '#22c55e' : '#0ecb81',
+                            wickDownColor: newVal ? '#ef4444' : '#f6465d',
+                            wickUpColor: newVal ? '#22c55e' : '#0ecb81',
+                        });
+
+                        this.volumeSeries.applyOptions({
+                            color: newVal ? '#3b82f6' : '#60a5fa',
+                        });
+                    }
+                }
+            },
+            methods: {
+                initializeChart() {
+                    const chartContainer = this.$refs.chartContainer;
+                    if (!chartContainer) return;
+
+                    if (this.chart) {
+                        this.chart.remove();
+                        this.chart = null;
+                    }
+
+                    const backgroundColor = this.isLightMode ? '#ffffff' : '#1a202c';
+                    const textColor = this.isLightMode ? '#374151' : '#e2e8f0';
+                    const gridColor = this.isLightMode ? '#f3f4f6' : '#2d3748';
+                    const borderColor = this.isLightMode ? '#d1d5db' : '#4a5568';
+
+                    this.chart = LightweightCharts.createChart(chartContainer, {
+                        width: chartContainer.offsetWidth,
+                        height: chartContainer.offsetHeight,
+                        layout: {
+                            background: { type: 'solid', color: backgroundColor },
+                            textColor: textColor,
+                        },
+                        grid: {
+                            vertLines: { color: gridColor },
+                            horzLines: { color: gridColor },
+                        },
+                        crosshair: {
+                            mode: LightweightCharts.CrosshairMode.Normal,
+                        },
+                        priceScale: {
+                            borderColor: borderColor,
+                        },
+                        timeScale: {
+                            borderColor: borderColor,
+                            timeVisible: true,
+                            secondsVisible: false,
+                        },
+                        rightPriceScale: {
+                            visible: true,
+                            borderColor: borderColor,
+                        },
+                        leftPriceScale: {
+                            visible: false,
+                        },
+                    });
+
+                    const upColor = this.isLightMode ? '#22c55e' : '#0ecb81';
+                    const downColor = this.isLightMode ? '#ef4444' : '#f6465d';
+
+                    this.candlestickSeries = this.chart.addCandlestickSeries({
+                        upColor: upColor,
+                        downColor: downColor,
+                        borderDownColor: downColor,
+                        borderUpColor: upColor,
+                        wickDownColor: downColor,
+                        wickUpColor: upColor,
+                    });
+
+                    this.volumeSeries = this.chart.addHistogramSeries({
+                        color: this.isLightMode ? '#3b82f6' : '#60a5fa',
+                        priceFormat: {
+                            type: 'volume',
+                        },
+                        priceScaleId: '',
+                        scaleMargins: {
+                            top: 0.8,
+                            bottom: 0,
+                        },
+                    });
+
+                    this.updateChartSize(); // Call updateChartSize after initialization
+                },
+
+                generateSampleData() {
+                    // Generar datos de ejemplo para las velas
+                    const data = [];
+                    const volumeData = [];
+                    let basePrice = 57000;
+                    const now = new Date();
+
+                    for (let i = 100; i >= 0; i--) {
+                        const time = Math.floor((now.getTime() - i * 60 * 1000) / 1000);
+                        const open = basePrice + (Math.random() - 0.5) * 100;
+                        const close = open + (Math.random() - 0.5) * 200;
+                        const high = Math.max(open, close) + Math.random() * 50;
+                        const low = Math.min(open, close) - Math.random() * 50;
+                        const volume = Math.random() * 1000;
+
+                        data.push({
+                            time: time,
+                            open: open,
+                            high: high,
+                            low: low,
+                            close: close
+                        });
+
+                        volumeData.push({
+                            time: time,
+                            value: volume,
+                            color: close > open ? '#22c55e40' : '#ef444440'
+                        });
+
+                        basePrice = close;
+                    }
+
+                    this.candlestickSeries.setData(data);
+                    this.volumeSeries.setData(volumeData);
+
+                    // Actualizar precio actual
+                    this.currentPrice = data[data.length - 1].close;
+                    this.buyPrice = this.currentPrice;
+                    this.sellPrice = this.currentPrice;
+
+                    // Calcular high y low del día
+                    this.dayHigh = Math.max(...data.map(d => d.high));
+                    this.dayLow = Math.min(...data.map(d => d.low));
+                },
+
+                updateChartSize() {
+                    if (this.chart && this.$refs.chartContainer) {
+                        const width = this.$refs.chartContainer.offsetWidth;
+                        const height = this.$refs.chartContainer.offsetHeight;
+                        this.chart.applyOptions({ width, height });
+                    }
+                },
+                toggleTheme() {
+                    this.isLightMode = !this.isLightMode;
+                },
+                cancelOrder(orderId) {
+                    const index = this.openOrders.findIndex(o => o.id === orderId);
+                    if (index !== -1) {
+                        const order = this.openOrders[index];
+                        this.openOrders.splice(index, 1);
+                        this.orderHistory.unshift({
+                            ...order,
+                            id: Date.now(),
+                            status: 'Cancelada'
+                        });
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

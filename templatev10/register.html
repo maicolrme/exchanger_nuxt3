@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoEx - Registro</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; transition: background-color 0.3s, color 0.3s; }
+        
+        /* Light Mode */
+        .light-mode { background-color: #f5f5f5; color: #1a1a1a; }
+        .light-mode .bg-gray-900 { background-color: #f5f5f5 !important; }
+        .light-mode .bg-gray-800 { background-color: #ffffff !important; border: 1px solid #e5e5e5; }
+        .light-mode .bg-gray-700 { background-color: #f8f8f8 !important; }
+        .light-mode .text-white { color: #1a1a1a !important; }
+        .light-mode .text-gray-300 { color: #666666 !important; }
+        .light-mode .text-gray-400 { color: #999999 !important; }
+
+        .toggle-switch { position: relative; width: 48px; height: 24px; background-color: #4b5563; border-radius: 12px; cursor: pointer; transition: background-color 0.3s; }
+        .toggle-switch.active { background-color: #fbbf24; }
+        .toggle-slider { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background-color: white; border-radius: 50%; transition: transform 0.3s; }
+        .toggle-switch.active .toggle-slider { transform: translateX(24px); }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div id="app" class="min-h-screen relative">
+        <!-- Header -->
+        <header class="bg-gray-800 border-b border-gray-700 sticky top-0 z-50">
+             <div class="px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <button @click="goBack" class="text-gray-400 hover:text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <h1 class="text-xl font-bold text-yellow-400">CryptoEx</h1>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="hidden md:flex items-center gap-2">
+                        <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                        <div @click="toggleTheme" class="toggle-switch" :class="{'active': isLightMode}"><div class="toggle-slider"></div></div>
+                        <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
+                    </div>
+                    <button class="text-gray-400 hover:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg></button>
+                </div>
+            </div>
+        </header>
+        <div class="flex items-center justify-center p-4 min-h-screen">
+        <div class="max-w-md w-full bg-gray-800 rounded-lg p-4 sm:p-8 shadow-lg mx-4 sm:mx-0">
+            <div class="text-center mb-8">
+                <h1 class="text-xl sm:text-2xl font-bold mb-2">Crea tu cuenta en CryptoEx</h1>
+                <p class="text-gray-400">Únete a la plataforma líder en trading de criptomonedas</p>
+            </div>
+
+            <form @submit.prevent="register" class="space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2" for="firstName">Nombre</label>
+                        <input type="text" id="firstName" v-model="firstName" required
+                            class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2" for="lastName">Apellido</label>
+                        <input type="text" id="lastName" v-model="lastName" required
+                            class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2" for="email">Correo Electrónico</label>
+                    <input type="email" id="email" v-model="email" required
+                        class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2" for="password">Contraseña</label>
+                    <input type="password" id="password" v-model="password" required
+                        class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    <p class="mt-1 text-xs sm:text-sm text-gray-400">Mínimo 8 caracteres, incluyendo mayúsculas, números y símbolos</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2" for="confirmPassword">Confirmar Contraseña</label>
+                    <input type="password" id="confirmPassword" v-model="confirmPassword" required
+                        class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                </div>
+
+                <div class="flex items-start">
+                    <input type="checkbox" id="terms" v-model="terms" required class="mt-1 mr-2">
+                    <label for="terms" class="text-xs sm:text-sm text-gray-400">
+                        Acepto los <a href="#" class="text-yellow-500 hover:text-yellow-400">Términos de Servicio</a> y la
+                        <a href="#" class="text-yellow-500 hover:text-yellow-400">Política de Privacidad</a>
+                    </label>
+                </div>
+
+                <button type="submit" 
+                    class="w-full py-3 bg-yellow-500 text-gray-900 rounded font-semibold hover:bg-yellow-400 transition"
+                    :disabled="!isFormValid">
+                    Crear Cuenta
+                </button>
+            </form>
+
+            <div class="mt-6 text-center text-sm">
+                <p class="text-gray-400">
+                    ¿Ya tienes una cuenta?
+                    <a href="login.html" class="text-yellow-500 hover:text-yellow-400 font-medium">Inicia sesión aquí</a>
+                </p>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                firstName: '',
+                lastName: '',
+                email: '',
+                password: '',
+                confirmPassword: '',
+                terms: false,
+                isLightMode: false
+            },
+            computed: {
+                isFormValid() {
+                    return this.firstName && 
+                           this.lastName && 
+                           this.email && 
+                           this.password && 
+                           this.confirmPassword && 
+                           this.password === this.confirmPassword && 
+                           this.password.length >= 8 && 
+                           this.terms;
+                }
+            },
+            methods: {
+                register() {
+                    if (this.isFormValid) {
+                        // Aquí se implementará la lógica de registro
+                        console.log('Registrando usuario...', {
+                            firstName: this.firstName,
+                            lastName: this.lastName,
+                            email: this.email,
+                            password: this.password
+                        });
+                    }
+                },
+                goBack() {
+                    window.history.back();
+                },
+                toggleTheme() {
+                    this.isLightMode = !this.isLightMode;
+                    localStorage.setItem('isLightMode', this.isLightMode);
+                }
+            }
+            },
+            mounted() {
+                this.isLightMode = localStorage.getItem('isLightMode') === 'true';
+                this.applyTheme();
+            },
+            watch: {
+                isLightMode(newVal) {
+                    this.applyTheme();
+                }
+            },
+            methods: {
+                applyTheme() {
+                    if (this.isLightMode) {
+                        document.body.classList.add('light-mode');
+                    } else {
+                        document.body.classList.remove('light-mode');
+                    }
+                },
+                register() {
+                    if (this.isFormValid) {
+                        // Aquí se implementará la lógica de registro
+                        console.log('Registrando usuario...', {
+                            firstName: this.firstName,
+                            lastName: this.lastName,
+                            email: this.email,
+                            password: this.password
+                        });
+                    }
+                },
+                goBack() {
+                    window.history.back();
+                },
+                toggleTheme() {
+                    this.isLightMode = !this.isLightMode;
+                    localStorage.setItem('isLightMode', this.isLightMode);
+                }
+            }
+        });
+        });
+    </script>
+</body>
+</html>

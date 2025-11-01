@@ -1,0 +1,160 @@
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoEx - Tarifas</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; transition: background-color 0.3s, color 0.3s; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Light Mode Styles */
+        .light-mode { background-color: #f5f5f5; color: #1a1a1a; }
+        .light-mode .bg-gray-900 { background-color: #f5f5f5 !important; }
+        .light-mode .bg-gray-800 { background-color: #ffffff !important; border: 1px solid #e5e5e5; }
+        .light-mode .bg-gray-700 { background-color: #f8f8f8 !important; }
+        .light-mode .text-white { color: #1a1a1a !important; }
+        .light-mode .text-gray-300 { color: #666666 !important; }
+        .light-mode .text-gray-400 { color: #999999 !important; }
+        .light-mode .border-gray-700 { border-color: #e5e5e5 !important; }
+        .light-mode .chat-bubble-sent { background-color: #facc15 !important; color: #1a1a1a !important; }
+        .light-mode .chat-bubble-received { background-color: #e5e7eb !important; color: #1a1a1a !important; }
+        .light-mode input { background-color: #f0f0f0 !important; border-color: #e5e5e5 !important; }
+
+        .toggle-switch { position: relative; width: 48px; height: 24px; background-color: #4b5563; border-radius: 12px; cursor: pointer; transition: background-color 0.3s; }
+        .toggle-switch.active { background-color: #fbbf24; }
+        .toggle-slider { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background-color: white; border-radius: 50%; transition: transform 0.3s; }
+        .toggle-switch.active .toggle-slider { transform: translateX(24px); }
+
+        .chat-bubble-sent { background-color: #fbbf24; color: #1f2937; }
+        .chat-bubble-received { background-color: #374151; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white" :class="{'light-mode': isLightMode}">
+    <div id="app">
+        <!-- Header -->
+        <header class="bg-gray-800 border-b border-gray-700 sticky top-0 z-50">
+            <div class="px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <button @click="goBack" class="text-gray-400 hover:text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <h1 class="text-xl font-bold text-yellow-400">CryptoEx</h1>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="hidden md:flex items-center gap-2">
+                        <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                        <div @click="toggleTheme" class="toggle-switch" :class="{'active': isLightMode}"><div class="toggle-slider"></div></div>
+                        <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
+                    </div>
+                    <button class="text-gray-400 hover:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg></button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="container mx-auto px-4 py-6">
+            <h2 class="text-3xl font-bold text-center mb-8">Tarifas de Trading y P2P Exchange</h2>
+            <div class="bg-gray-800 rounded-lg p-6 max-w-2xl mx-auto">
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-200 mb-4">Tarifas de Trading Spot</h3>
+                        <ul class="list-disc list-inside text-gray-300 space-y-2">
+                            <li>Maker Fee: 0.1%</li>
+                            <li>Taker Fee: 0.1%</li>
+                            <li>Descuentos por volumen de trading disponibles.</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-200 mb-4">Tarifas de P2P Exchange</h3>
+                        <ul class="list-disc list-inside text-gray-300 space-y-2">
+                            <li>Publicar Anuncio: Gratis</li>
+                            <li>Comprar Criptomonedas: Gratis</li>
+                            <li>Vender Criptomonedas: Gratis</li>
+                            <li>Las tarifas pueden aplicar por el método de pago seleccionado por el usuario.</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-200 mb-4">Tarifas de Depósito y Retiro</h3>
+                        <ul class="list-disc list-inside text-gray-300 space-y-2">
+                            <li>Depósitos de Criptomonedas: Gratis</li>
+                            <li>Retiros de Criptomonedas: Varía según la red y la criptomoneda. Consulta la página de retiros para más detalles.</li>
+                            <li>Depósitos Fiat: Gratis</li>
+                            <li>Retiros Fiat: Varía según el método y la moneda.</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-200 mb-4">Tarifas de Retiro por Red</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-700">
+                                <thead class="bg-gray-700">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Criptomoneda</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Red</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Tarifa de Retiro</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-gray-800 divide-y divide-gray-700">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">BTC</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">Bitcoin</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">0.0005 BTC</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">ETH</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">ERC20</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">0.003 ETH</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">USDT</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">TRC20</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">1 USDT</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">USDT</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">ERC20</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">5 USDT</td>
+                                    </tr>
+                                    <!-- Add more rows as needed -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <p class="text-gray-400 text-sm mt-6">Para obtener información detallada y actualizada sobre todas las tarifas, por favor, consulta nuestra sección de <a href="#" class="text-yellow-500 hover:underline">Términos y Condiciones</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                isLightMode: false
+            },
+            methods: {
+                toggleTheme() {
+                    this.isLightMode = !this.isLightMode;
+                    localStorage.setItem('isLightMode', this.isLightMode);
+                },
+                goBack() {
+                    window.history.back();
+                }
+            },
+            mounted() {
+                const savedTheme = localStorage.getItem('isLightMode');
+                if (savedTheme !== null) {
+                    this.isLightMode = JSON.parse(savedTheme);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

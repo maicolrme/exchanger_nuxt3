@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoEx - Sala de Intercambio P2P (Vendedor)</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; transition: background-color 0.3s, color 0.3s; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Light Mode Styles */
+        .light-mode { background-color: #f5f5f5; color: #1a1a1a; }
+        .light-mode .bg-gray-900 { background-color: #f5f5f5 !important; }
+        .light-mode .bg-gray-800 { background-color: #ffffff !important; border: 1px solid #e5e5e5; }
+        .light-mode .bg-gray-700 { background-color: #f8f8f8 !important; }
+        .light-mode .text-white { color: #1a1a1a !important; }
+        .light-mode .text-gray-300 { color: #666666 !important; }
+        .light-mode .text-gray-400 { color: #999999 !important; }
+        .light-mode .border-gray-700 { border-color: #e5e5e5 !important; }
+        .light-mode .chat-bubble-sent { background-color: #facc15 !important; color: #1a1a1a !important; }
+        .light-mode .chat-bubble-received { background-color: #e5e7eb !important; color: #1a1a1a !important; }
+        .light-mode input { background-color: #f0f0f0 !important; border-color: #e5e5e5 !important; }
+
+        .toggle-switch { position: relative; width: 48px; height: 24px; background-color: #4b5563; border-radius: 12px; cursor: pointer; transition: background-color 0.3s; }
+        .toggle-switch.active { background-color: #fbbf24; }
+        .toggle-slider { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background-color: white; border-radius: 50%; transition: transform 0.3s; }
+        .toggle-switch.active .toggle-slider { transform: translateX(24px); }
+
+        .chat-bubble-sent { background-color: #fbbf24; color: #1f2937; }
+        .chat-bubble-received { background-color: #374151; }
+        
+        button:disabled { cursor: not-allowed; opacity: 0.5; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white" :class="{'light-mode': isLightMode}">
+    <div id="app">
+        <!-- Header -->
+        <header class="bg-gray-800 border-b border-gray-700 sticky top-0 z-50">
+             <div class="px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <button @click="goBack" class="text-gray-400 hover:text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <h1 class="text-xl font-bold text-yellow-400">CryptoEx</h1>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="hidden md:flex items-center gap-2">
+                        <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                        <div @click="toggleTheme" class="toggle-switch" :class="{'active': isLightMode}"><div class="toggle-slider"></div></div>
+                        <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
+                    </div>
+                    <button class="text-gray-400 hover:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg></button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="container mx-auto px-4 py-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column: Trade Details -->
+                <div class="lg:col-span-2 bg-gray-800 rounded-lg p-6 space-y-6">
+                    <div>
+                        <h2 class="text-2xl font-bold">Vender {{ tradeDetails.cryptoAmount }} {{ tradeDetails.crypto }}</h2>
+                        <p class="text-gray-400">Estado: <span class="font-semibold" :class="statusColor">{{ tradeDetails.status }}</span></p>
+                        <p class="text-gray-400" v-if="!tradeDetails.orderCompleted">Tiempo restante: <span class="font-semibold text-yellow-400">{{ remainingTime }}</span></p>
+                    </div>
+
+                    <div class="border-t border-b border-gray-700 py-6 space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Cantidad a recibir</span>
+                            <span class="text-2xl font-bold text-yellow-400">{{ tradeDetails.fiatAmount.toLocaleString('es-ES') }} {{ tradeDetails.fiat }}</span>
+                        </div>
+                         <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Comprador</span>
+                            <span class="font-semibold">{{ tradeDetails.buyerName }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">ID de la Orden</span>
+                            <span class="font-mono text-sm">{{ tradeDetails.orderId }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-700 rounded-lg p-4 text-center">
+                        <h3 class="font-bold text-lg text-yellow-400">Acción Requerida</h3>
+                        <p class="text-gray-300 mt-2">{{ actionMessage }}</p>
+                    </div>
+
+                    <div class="bg-gray-700 rounded-lg p-4 space-y-2" v-if="tradeDetails.paymentConfirmed">
+                        <h3 class="font-bold text-lg text-yellow-400">Comprobante de Pago</h3>
+                        <p class="text-gray-300">El comprador ha subido un comprobante de pago. Por favor, revísalo cuidadosamente antes de liberar las criptomonedas.</p>
+                        <button @click="viewPaymentProof" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-lg transition">
+                            Ver Comprobante
+                        </button>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <button @click="releaseCrypto" :disabled="!tradeDetails.paymentConfirmed" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg transition">
+                            Liberar Criptomonedas
+                        </button>
+                        <button @click="startAppeal" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-lg transition">
+                            Iniciar Apelación
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Column: Chat -->
+                <div class="bg-gray-800 rounded-lg flex flex-col h-[70vh]">
+                    <div class="p-4 border-b border-gray-700">
+                        <h3 class="font-bold">Chat con {{ tradeDetails.buyerName }}</h3>
+                        <div class="text-xs text-gray-400 flex items-center gap-2 mt-1">
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            En línea
+                        </div>
+                    </div>
+                    <div ref="chatbox" class="flex-1 p-4 space-y-4 overflow-y-auto scrollbar-hide">
+                        <!-- Chat Messages -->
+                        <div v-for="message in chatMessages" :key="message.id" class="flex" :class="message.sender === 'me' ? 'justify-end' : 'justify-start'">
+                            <div class="max-w-xs md:max-w-md p-3 rounded-lg" :class="message.sender === 'me' ? 'chat-bubble-sent rounded-br-none' : 'chat-bubble-received rounded-bl-none'">
+                                <p class="text-sm">{{ message.text }}</p>
+                                <p class="text-xs text-right mt-1 opacity-70">{{ message.time }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 border-t border-gray-700">
+                        <form @submit.prevent="sendMessage" class="flex gap-2">
+                            <button type="button" @click="triggerFileUpload" class="bg-gray-700 hover:bg-gray-600 text-gray-300 font-bold px-4 rounded-lg transition">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                            </button>
+                            <input v-model="newMessage" type="text" placeholder="Escribe un mensaje..." class="flex-1 bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
+                            <button type="submit" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold px-4 rounded-lg transition">
+                               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" transform="rotate(90 12 12) translate(0 24)"></path></svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                isLightMode: false,
+                newMessage: '',
+                tradeDetails: {
+                    crypto: 'BTC',
+                    cryptoAmount: 0.05,
+                    fiat: 'EUR',
+                    fiatAmount: 3257.51,
+                    orderId: 'A4B2C1D8E6F5G7H9',
+                    status: 'El comprador ha confirmado el pago',
+                    buyerName: 'CryptoBuyer007',
+                    paymentConfirmed: true, // Simulates buyer has confirmed payment
+                    orderCompleted: false,
+                    startTime: new Date().getTime(), // Current time for demonstration
+                    durationMinutes: 30 // 30 minutes for the operation
+                },
+                remainingTime: '00:00',
+                timerInterval: null,
+                chatMessages: [
+                    { id: 1, sender: 'buyer', text: '¡Hola! Ya he realizado el pago, por favor, verifica.', time: '10:45' },
+                    { id: 2, sender: 'me', text: 'Recibido. Voy a verificar la transferencia ahora mismo. Un momento.', time: '10:46' },
+                ]
+            },
+            computed: {
+                actionMessage() {
+                    if (this.tradeDetails.orderCompleted) {
+                        return 'La transacción se ha completado con éxito.';
+                    }
+                    if (this.tradeDetails.paymentConfirmed) {
+                        return 'El comprador ha marcado el pago como realizado. Por favor, verifica en tu cuenta que has recibido el importe exacto y libera las criptomonedas.';
+                    }
+                    return 'Esperando a que el comprador realice y confirme el pago.';
+                },
+                statusColor() {
+                    if (this.tradeDetails.orderCompleted) return 'text-green-500';
+                    if (this.tradeDetails.paymentConfirmed) return 'text-yellow-400';
+                    return 'text-gray-400';
+                }
+            },
+            methods: {
+                toggleTheme() { this.isLightMode = !this.isLightMode; },
+                goBack() { console.log('Go back'); },
+                sendMessage() {
+                    if (this.newMessage.trim() === '') return;
+                    this.chatMessages.push({
+                        id: this.chatMessages.length + 1,
+                        sender: 'me',
+                        text: this.newMessage,
+                        time: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+                    });
+                    this.newMessage = '';
+                    this.$nextTick(() => {
+                         const chatbox = this.$refs.chatbox;
+                         chatbox.scrollTop = chatbox.scrollHeight;
+                    });
+                },
+                releaseCrypto() {
+                    if (confirm('¿Estás seguro de que has recibido el pago correcto y quieres liberar las criptomonedas? Esta acción es irreversible.')) {
+                        alert('¡Criptomonedas liberadas! La orden ha sido completada.');
+                        this.tradeDetails.status = 'Orden Completada';
+                        this.tradeDetails.orderCompleted = true;
+                    }
+                },
+                startAppeal() {
+                    alert('Se ha iniciado un proceso de apelación. El soporte se pondrá en contacto contigo pronto.');
+                },
+                triggerFileUpload() {
+                    alert('Función para adjuntar archivo (ej: comprobante de pago) se activaría aquí.');
+                },
+                viewPaymentProof() {
+                    alert('Aquí se mostraría el comprobante de pago subido por el comprador.');
+                }
+            },
+            created() {
+                this.isLightMode = localStorage.getItem('theme') === 'light';
+                this.startTimer();
+            },
+            beforeDestroy() {
+                clearInterval(this.timerInterval);
+            },
+            methods: {
+                toggleTheme() {
+                    this.isLightMode = !this.isLightMode;
+                    localStorage.setItem('theme', this.isLightMode ? 'light' : 'dark');
+                },
+                goBack() { console.log('Go back'); },
+                startTimer() {
+                    this.timerInterval = setInterval(() => {
+                        const now = new Date().getTime();
+                        const elapsed = now - this.tradeDetails.startTime;
+                        const totalDurationMs = this.tradeDetails.durationMinutes * 60 * 1000;
+                        const timeLeftMs = totalDurationMs - elapsed;
+
+                        if (timeLeftMs <= 0) {
+                            this.remainingTime = '00:00';
+                            clearInterval(this.timerInterval);
+                            // Optionally, handle what happens when time runs out
+                            console.log('Tiempo de operación agotado.');
+                        } else {
+                            const minutes = Math.floor((timeLeftMs % (1000 * 60 * 60)) / (1000 * 60));
+                            const seconds = Math.floor((timeLeftMs % (1000 * 60)) / 1000);
+                            this.remainingTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                        }
+                    }, 1000);
+                },
+                sendMessage() {
+                    if (this.newMessage.trim() === '') return;
+                    this.chatMessages.push({
+                        id: this.chatMessages.length + 1,
+                        sender: 'me',
+                        text: this.newMessage,
+                        time: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+                    });
+                    this.newMessage = '';
+                    this.$nextTick(() => {
+                         const chatbox = this.$refs.chatbox;
+                         chatbox.scrollTop = chatbox.scrollHeight;
+                    });
+                },
+                releaseCrypto() {
+                    if (confirm('¿Estás seguro de que has recibido el pago correcto y quieres liberar las criptomonedas? Esta acción es irreversible.')) {
+                        alert('¡Criptomonedas liberadas! La orden ha sido completada.');
+                        this.tradeDetails.status = 'Orden Completada';
+                        this.tradeDetails.orderCompleted = true;
+                    }
+                },
+                startAppeal() {
+                    alert('Se ha iniciado un proceso de apelación. El soporte se pondrá en contacto contigo pronto.');
+                },
+                triggerFileUpload() {
+                    alert('Función para adjuntar archivo (ej: comprobante de pago) se activaría aquí.');
+                },
+                viewPaymentProof() {
+                    alert('Aquí se mostraría el comprobante de pago subido por el comprador.');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

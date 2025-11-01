@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoEx - Staking</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .staking-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .staking-card:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div id="app" class="min-h-screen relative">
+        <button @click="goBack" class="absolute top-4 left-4 text-white hover:text-yellow-500 transition-colors duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+        </button>
+
+        <div class="container mx-auto px-4 py-8">
+            <div class="text-center mb-12">
+                <h1 class="text-3xl sm:text-4xl font-bold mb-4">Staking de Criptomonedas</h1>
+                <p class="text-gray-400 text-lg">Gana recompensas pasivas bloqueando tus tokens</p>
+            </div>
+
+            <!-- Balance y Estadísticas -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-gray-800 rounded-lg p-6 text-center">
+                    <h3 class="text-lg font-medium text-gray-400 mb-2">Total en Staking</h3>
+                    <p class="text-2xl font-bold">{{ totalStaked }} USD</p>
+                </div>
+                <div class="bg-gray-800 rounded-lg p-6 text-center">
+                    <h3 class="text-lg font-medium text-gray-400 mb-2">Recompensas Pendientes</h3>
+                    <p class="text-2xl font-bold text-yellow-500">{{ pendingRewards }} USD</p>
+                </div>
+                <div class="bg-gray-800 rounded-lg p-6 text-center">
+                    <h3 class="text-lg font-medium text-gray-400 mb-2">APY Promedio</h3>
+                    <p class="text-2xl font-bold text-green-500">{{ averageAPY }}%</p>
+                </div>
+            </div>
+
+            <!-- Opciones de Staking -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div v-for="option in stakingOptions" :key="option.token" 
+                     class="staking-card bg-gray-800 rounded-lg overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <img :src="option.icon" :alt="option.token" class="w-8 h-8 mr-3">
+                                <h3 class="text-xl font-bold">{{ option.token }}</h3>
+                            </div>
+                            <span class="text-green-500 font-bold">{{ option.apy }}% APY</span>
+                        </div>
+                        <div class="space-y-3 mb-6">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">Mínimo</span>
+                                <span>{{ option.minimum }} {{ option.token }}</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">Período de Bloqueo</span>
+                                <span>{{ option.lockPeriod }}</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">Total Bloqueado</span>
+                                <span>{{ option.totalStaked }} {{ option.token }}</span>
+                            </div>
+                        </div>
+                        <button @click="openStakingModal(option)" 
+                                class="w-full py-3 bg-yellow-500 text-gray-900 rounded font-semibold hover:bg-yellow-400 transition">
+                            Hacer Staking
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal de Staking -->
+            <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+                <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full">
+                    <h3 class="text-xl font-bold mb-4">Hacer Staking de {{ selectedOption.token }}</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Cantidad</label>
+                            <input type="number" v-model="stakingAmount" 
+                                   class="w-full px-3 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                   :min="selectedOption.minimum"
+                                   :step="0.01">
+                            <p class="text-sm text-gray-400 mt-1">Mínimo: {{ selectedOption.minimum }} {{ selectedOption.token }}</p>
+                        </div>
+                        <div class="bg-gray-700 rounded p-4 text-sm">
+                            <div class="flex justify-between mb-2">
+                                <span>APY Estimado</span>
+                                <span class="text-green-500">{{ selectedOption.apy }}%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Recompensa Estimada</span>
+                                <span class="text-yellow-500">{{ estimatedReward }} {{ selectedOption.token }}/año</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex space-x-4 mt-6">
+                        <button @click="confirmStaking" 
+                                class="flex-1 py-3 bg-yellow-500 text-gray-900 rounded font-semibold hover:bg-yellow-400 transition"
+                                :disabled="!isValidAmount">
+                            Confirmar
+                        </button>
+                        <button @click="closeModal" 
+                                class="flex-1 py-3 bg-gray-700 rounded font-semibold hover:bg-gray-600 transition">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                totalStaked: '25,430.50',
+                pendingRewards: '142.75',
+                averageAPY: '12.5',
+                stakingOptions: [
+                    {
+                        token: 'BTC',
+                        icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.svg',
+                        apy: 5.5,
+                        minimum: 0.01,
+                        lockPeriod: '30 días',
+                        totalStaked: '125.45'
+                    },
+                    {
+                        token: 'ETH',
+                        icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.svg',
+                        apy: 7.2,
+                        minimum: 0.1,
+                        lockPeriod: '60 días',
+                        totalStaked: '1,245.78'
+                    },
+                    {
+                        token: 'DOT',
+                        icon: 'https://cryptologos.cc/logos/polkadot-new-dot-logo.svg',
+                        apy: 12.0,
+                        minimum: 5,
+                        lockPeriod: '90 días',
+                        totalStaked: '15,789.32'
+                    }
+                ],
+                showModal: false,
+                selectedOption: null,
+                stakingAmount: 0
+            },
+            computed: {
+                isValidAmount() {
+                    return this.stakingAmount >= (this.selectedOption?.minimum || 0);
+                },
+                estimatedReward() {
+                    if (!this.selectedOption || !this.stakingAmount) return 0;
+                    return ((this.stakingAmount * this.selectedOption.apy) / 100).toFixed(4);
+                }
+            },
+            methods: {
+                goBack() {
+                    window.history.back();
+                },
+                openStakingModal(option) {
+                    this.selectedOption = option;
+                    this.stakingAmount = option.minimum;
+                    this.showModal = true;
+                },
+                closeModal() {
+                    this.showModal = false;
+                    this.selectedOption = null;
+                    this.stakingAmount = 0;
+                },
+                confirmStaking() {
+                    if (this.isValidAmount) {
+                        // Aquí se implementará la lógica de staking
+                        console.log('Realizando staking:', {
+                            token: this.selectedOption.token,
+                            amount: this.stakingAmount
+                        });
+                        this.closeModal();
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

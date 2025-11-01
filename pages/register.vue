@@ -1,54 +1,56 @@
 <template>
-  <div class="auth-container">
-    <div class="auth-card">
-      <h2 class="text-center mb-4">Crear Cuenta</h2>
+  <div class="flex justify-center items-center min-h-[calc(100vh-180px)]">
+    <div class="max-w-md w-full bg-gray-800 rounded-lg p-4 sm:p-6 shadow-lg mx-2 sm:mx-0">
+      <div class="text-center mb-6">
+        <h2 class="text-xl font-bold text-yellow-400">Crear Cuenta</h2>
+      </div>
       
-      <div v-if="error" class="alert alert-danger">
+      <div v-if="error" class="mb-4 p-3 bg-red-500 bg-opacity-20 border border-red-500 text-red-500 rounded-md">
         {{ error }}
       </div>
       
-      <form @submit.prevent="handleRegister">
-        <div class="form-group">
-          <label for="name">Nombre</label>
+      <form @submit.prevent="handleRegister" class="space-y-6">
+        <div>
+          <label class="block text-sm font-medium mb-1" for="name">Nombre</label>
           <input 
             type="text" 
-            class="form-control" 
             id="name" 
             v-model="name" 
             required
             placeholder="Ingrese su nombre"
+            class="w-full px-3 py-2 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-base"
           >
         </div>
         
-        <div class="form-group">
-          <label for="email">Correo Electrónico</label>
+        <div>
+          <label class="block text-sm font-medium mb-1" for="email">Correo Electrónico</label>
           <input 
             type="email" 
-            class="form-control" 
             id="email" 
             v-model="email" 
             required
             placeholder="Ingrese su correo electrónico"
+            class="w-full px-3 py-2 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-base"
           >
         </div>
         
-        <div class="form-group">
-          <label for="password">Contraseña</label>
+        <div>
+          <label class="block text-sm font-medium mb-1" for="password">Contraseña</label>
           <input 
             type="password" 
-            class="form-control" 
             id="password" 
             v-model="password" 
             required
             placeholder="Ingrese su contraseña"
+            class="w-full px-3 py-2 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-base"
           >
         </div>
         
-        <div class="form-group">
-          <label for="password_confirmation">Confirmar Contraseña</label>
+        <div>
+          <label class="block text-sm font-medium mb-1" for="password_confirmation">Confirmar Contraseña</label>
           <input 
             type="password" 
-            class="form-control" 
+            class="w-full px-3 py-2 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-base"
             id="password_confirmation" 
             v-model="passwordConfirmation" 
             required
@@ -56,9 +58,22 @@
           >
         </div>
         
+        <div class="flex items-center mb-4">
+          <input 
+            type="checkbox" 
+            class="mr-2 form-checkbox h-4 w-4 text-yellow-500 transition duration-150 ease-in-out rounded focus:ring-yellow-500"
+            id="terms" 
+            v-model="terms" 
+            required
+          >
+          <label class="text-sm" for="terms">
+            Acepto los <a href="#" class="text-yellow-500 hover:text-yellow-400">Términos y Condiciones</a>
+          </label>
+        </div>
+        
         <button 
           type="submit" 
-          class="btn btn-primary btn-block" 
+          class="w-full py-2 bg-yellow-500 text-gray-900 rounded-md font-semibold hover:bg-yellow-400 transition-colors duration-300 text-base"
           :disabled="loading"
         >
           {{ loading ? 'Registrando...' : 'Registrarse' }}
@@ -66,7 +81,7 @@
       </form>
       
       <div class="mt-3 text-center">
-        <p>¿Ya tienes una cuenta? <NuxtLink to="/login" class="text-primary">Iniciar Sesión</NuxtLink></p>
+        <p class="text-sm">¿Ya tienes una cuenta? <NuxtLink to="/login" class="text-yellow-500 hover:text-yellow-400">Iniciar Sesión</NuxtLink></p>
       </div>
     </div>
   </div>
@@ -79,6 +94,10 @@ import { useAuth } from '~/composables/useAuth';
 
 const router = useRouter();
 const { register, error: authError, loading } = useAuth();
+
+definePageMeta({
+  layout: 'p2p'
+});
 
 const name = ref('');
 const email = ref('');
@@ -114,65 +133,3 @@ async function handleRegister() {
 }
 </script>
 
-<style scoped>
-.auth-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #121212;
-}
-
-.auth-card {
-  background-color: #1e1e1e;
-  border-radius: 8px;
-  padding: 30px;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-h2 {
-  color: #00ff00;
-  margin-bottom: 20px;
-}
-
-.form-control {
-  background-color: #333;
-  border-color: #444;
-  color: white;
-}
-
-.form-control:focus {
-  background-color: #444;
-  border-color: #00ff00;
-  color: white;
-  box-shadow: 0 0 0 0.2rem rgba(0, 255, 0, 0.25);
-}
-
-.btn-primary {
-  background-color: #00ff00;
-  border-color: #00ff00;
-  color: #000;
-}
-
-.btn-primary:hover, .btn-primary:focus {
-  background-color: #00cc00;
-  border-color: #00cc00;
-  color: #000;
-}
-
-.btn-primary:disabled {
-  background-color: #006600;
-  border-color: #006600;
-}
-
-a {
-  color: #00ff00;
-}
-
-a:hover {
-  color: #00cc00;
-  text-decoration: none;
-}
-</style>

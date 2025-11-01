@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoEx - Mis Wallets</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; transition: background-color 0.3s, color 0.3s; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Light Mode Styles */
+        .light-mode { background-color: #f5f5f5; color: #1a1a1a; }
+        .light-mode .bg-gray-900 { background-color: #f5f5f5 !important; }
+        .light-mode .bg-gray-800 { background-color: #ffffff !important; border: 1px solid #e5e5e5; }
+        .light-mode .bg-gray-700 { background-color: #f8f8f8 !important; }
+        .light-mode .text-white { color: #1a1a1a !important; }
+        .light-mode .text-gray-300 { color: #666666 !important; }
+        .light-mode .text-gray-400 { color: #999999 !important; }
+        .light-mode .border-gray-700 { border-color: #e5e5e5 !important; }
+
+        .toggle-switch { position: relative; width: 48px; height: 24px; background-color: #4b5563; border-radius: 12px; cursor: pointer; transition: background-color 0.3s; }
+        .toggle-switch.active { background-color: #fbbf24; }
+        .toggle-slider { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background-color: white; border-radius: 50%; transition: transform 0.3s; }
+        .toggle-switch.active .toggle-slider { transform: translateX(24px); }
+
+        /* Animations */
+        .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
+        .fade-enter, .fade-leave-to { opacity: 0; }
+
+        /* Custom Styles */
+        .wallet-card { transition: transform 0.2s; }
+        .wallet-card:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body class="bg-gray-900 text-white" :class="{'light-mode': isLightMode}">
+    <div id="app">
+        <!-- Header -->
+        <header class="bg-gray-800 border-b border-gray-700 sticky top-0 z-50">
+            <div class="px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <button @click="goBack" class="text-gray-400 hover:text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <h1 class="text-xl font-bold text-yellow-400">Mis Wallets</h1>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="hidden md:flex items-center gap-2">
+                        <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                        <div @click="toggleTheme" class="toggle-switch" :class="{'active': isLightMode}"><div class="toggle-slider"></div></div>
+                        <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
+                    </div>
+                </div>
+            </div>
+
+
+        </header>
+
+        <!-- Main Content -->
+          <div class="container mx-auto px-4 py-6">
+            <!-- Balance Total -->
+            <div class="bg-gray-800 rounded-lg p-6 mb-6 text-center">
+                <p class="text-sm text-gray-400">Balance Total Estimado</p>
+                <h2 class="text-4xl font-bold text-yellow-400 mt-2">{{ totalBalance }} EUR</h2>
+                <p class="text-md text-gray-400 mt-1">≈ {{ btcBalance }} BTC</p>
+            </div>
+            <!-- Wallets List -->
+            <div class="space-y-2">
+                <div v-for="wallet in wallets" :key="wallet.symbol" class="bg-gray-800 rounded-lg p-4 flex items-center justify-between hover:bg-gray-700 transition-colors duration-300">
+                    <div class="flex items-center gap-4">
+                        <img :src="wallet.icon" :alt="wallet.name" class="w-10 h-10">
+                        <div>
+                            <h3 class="font-bold text-md">{{ wallet.name }}</h3>
+                            <p class="text-sm text-gray-400">{{ wallet.symbol }}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-md">{{ wallet.balance }}</p>
+                        <p class="text-sm text-gray-400">≈ {{ wallet.fiatValue }} EUR</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button @click="deposit(wallet.symbol)" class="bg-gray-700 hover:bg-yellow-500 text-white hover:text-gray-900 font-bold p-2 rounded-full transition text-xs" title="Depositar">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                        </button>
+                        <button @click="transfer(wallet.symbol)" class="bg-gray-700 hover:bg-blue-500 text-white font-bold p-2 rounded-full transition text-xs" title="Transferir">
+                           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                        </button>
+                        <button @click="withdraw(wallet.symbol)" class="bg-gray-700 hover:bg-red-500 text-white font-bold p-2 rounded-full transition text-xs" title="Retirar">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                isLightMode: false,
+                totalBalance: '25,487.32',
+                btcBalance: '0.58432',
+                wallets: [
+                    {
+                        name: 'Bitcoin',
+                        symbol: 'BTC',
+                        balance: '0.3854',
+                        fiatValue: '15,487.32',
+                        icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.svg'
+                    },
+                    {
+                        name: 'Ethereum',
+                        symbol: 'ETH',
+                        balance: '4.2103',
+                        fiatValue: '8,750.00',
+                        icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.svg'
+                    },
+                    {
+                        name: 'USD Coin',
+                        symbol: 'USDC',
+                        balance: '1,250.00',
+                        fiatValue: '1,250.00',
+                        icon: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.svg'
+                    }
+                ]
+            },
+            methods: {
+                toggleTheme() {
+                    this.isLightMode = !this.isLightMode;
+                },
+                goBack() {
+                    window.history.back();
+                },
+                deposit(symbol) {
+                    // Implementar lógica de depósito
+                    console.log(`Depositar ${symbol}`);
+                },
+                withdraw(symbol) {
+                    // Implementar lógica de retiro
+                    console.log(`Retirar ${symbol}`);
+                },
+                transfer(symbol) {
+                    // Implementar lógica de transferencia
+                    console.log(`Transferir ${symbol}`);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

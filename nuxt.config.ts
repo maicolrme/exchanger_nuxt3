@@ -10,12 +10,12 @@ export default defineNuxtConfig({
         { name: 'viewport', content: 'width=device-width, initial-scale=1' }
       ],
       link: [
-        { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css' }
+      //  { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css' }
       ],
       script: [
         { src: 'https://code.jquery.com/jquery-3.6.0.slim.min.js', body: true },
         { src: 'https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js', body: true },
-        { src: 'https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js', body: true }
+     //   { src: 'https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js', body: true }
       ]
     }
   },
@@ -29,7 +29,16 @@ export default defineNuxtConfig({
     middleware: ['auth']
   },
   // Configuración de módulos
-  modules: [],
+  modules: ['@nuxtjs/tailwindcss'],
+  
+  // Configuración de Tailwind CSS
+  tailwindcss: {
+    cssPath: '~/assets/css/tailwind.css',
+    configPath: 'tailwind.config.js',
+    exposeConfig: false,
+    injectPosition: 0,
+    viewer: true,
+  },
   // Variables de entorno
   runtimeConfig: {
     public: {

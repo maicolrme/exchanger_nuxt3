@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoEx - Iniciar Sesión</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; transition: background-color 0.3s, color 0.3s; }
+        
+        /* Light Mode */
+        .light-mode { background-color: #f5f5f5; color: #1a1a1a; }
+        .light-mode .bg-gray-900 { background-color: #f5f5f5 !important; }
+        .light-mode .bg-gray-800 { background-color: #ffffff !important; border: 1px solid #e5e5e5; }
+        .light-mode .bg-gray-700 { background-color: #f8f8f8 !important; }
+        .light-mode .text-white { color: #1a1a1a !important; }
+        .light-mode .text-gray-300 { color: #666666 !important; }
+        .light-mode .text-gray-400 { color: #999999 !important; }
+
+        .toggle-switch { position: relative; width: 48px; height: 24px; background-color: #4b5563; border-radius: 12px; cursor: pointer; transition: background-color 0.3s; }
+        .toggle-switch.active { background-color: #fbbf24; }
+        .toggle-slider { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background-color: white; border-radius: 50%; transition: transform 0.3s; }
+        .toggle-switch.active .toggle-slider { transform: translateX(24px); }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div id="app" class="min-h-screen relative">
+        <!-- Header -->
+        <header class="bg-gray-800 border-b border-gray-700 sticky top-0 z-50">
+             <div class="px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <button @click="goBack" class="text-gray-400 hover:text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <h1 class="text-xl font-bold text-yellow-400">CryptoEx</h1>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="hidden md:flex items-center gap-2">
+                        <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                        <div @click="toggleTheme" class="toggle-switch" :class="{'active': isLightMode}"><div class="toggle-slider"></div></div>
+                        <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
+                    </div>
+                    <button class="text-gray-400 hover:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg></button>
+                </div>
+            </div>
+        </header>
+        <div class="flex items-center justify-center p-4 min-h-full">
+        <div class="max-w-md w-full bg-gray-800 rounded-lg p-4 sm:p-6 shadow-lg mx-2 sm:mx-0" style="margin-top: auto; margin-bottom: auto;">
+            <div class="text-center mb-6"></div>
+
+            <form @submit.prevent="login" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium mb-1" for="email">Correo Electrónico</label>
+                    <input type="email" id="email" v-model="email" required
+                        class="w-full px-3 py-2 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-base">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-1" for="password">Contraseña</label>
+                    <input type="password" id="password" v-model="password" required
+                        class="w-full px-3 py-2 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-base">
+                </div>
+
+                <div class="flex items-center justify-between text-sm">
+                    <label class="flex items-center text-sm">
+                        <input type="checkbox" v-model="remember" class="mr-2 form-checkbox h-4 w-4 text-yellow-500 transition duration-150 ease-in-out rounded focus:ring-yellow-500">
+                        Recordarme
+                    </label>
+                    <a href="forgot-password.html" class="text-yellow-500 hover:text-yellow-400 text-sm">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <button type="submit" 
+                    class="w-full py-2 bg-yellow-500 text-gray-900 rounded-md font-semibold hover:bg-yellow-400 transition-colors duration-300 text-base">
+                    Iniciar Sesión
+                </button>
+            </form>
+
+            <div class="mt-6 text-center text-sm">
+                <p class="text-gray-400">
+                    ¿No tienes una cuenta?
+                    <a href="register.html" class="text-yellow-500 hover:text-yellow-400 font-medium">Regístrate aquí</a>
+                </p>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <footer class="p-4 text-center text-gray-500 text-xs">
+        © 2023 CryptoEx. Todos los derechos reservados.
+    </footer>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                email: '',
+                password: '',
+                remember: false,
+                isLightMode: false
+            },
+            methods: {
+                login() {
+                    // Aquí se implementará la lógica de inicio de sesión
+                    console.log('Iniciando sesión...', {
+                        email: this.email,
+                        password: this.password,
+                        remember: this.remember
+                    });
+                },
+                goBack() {
+                    window.history.back();
+                },
+                toggleTheme() {
+                    this.isLightMode = !this.isLightMode;
+                    localStorage.setItem('isLightMode', this.isLightMode);
+                }
+            }
+            },
+            mounted() {
+                this.isLightMode = localStorage.getItem('isLightMode') === 'true';
+                this.applyTheme();
+            },
+            watch: {
+                isLightMode(newVal) {
+                    this.applyTheme();
+                }
+            },
+            methods: {
+                applyTheme() {
+                    if (this.isLightMode) {
+                        document.body.classList.add('light-mode');
+                    } else {
+                        document.body.classList.remove('light-mode');
+                    }
+                },
+                login() {
+                    // Aquí se implementará la lógica de inicio de sesión
+                    console.log('Iniciando sesión...', {
+                        email: this.email,
+                        password: this.password,
+                        remember: this.remember
+                    });
+                },
+                goBack() {
+                    window.history.back();
+                },
+                toggleTheme() {
+                    this.isLightMode = !this.isLightMode;
+                    localStorage.setItem('isLightMode', this.isLightMode);
+                }
+            }
+        });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar Depósito</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+    <style>
+        [v-cloak] { display: none; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1a202c;
+            color: #e2e8f0;
+        }
+        .light-mode body {
+            background-color: #f7fafc;
+            color: #2d3748;
+        }
+        .light-mode .bg-gray-800 {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+        }
+        .light-mode .text-gray-400 {
+            color: #718096;
+        }
+        .light-mode .hover\:bg-gray-700:hover {
+            background-color: #edf2f7;
+        }
+        .light-mode .bg-yellow-500 {
+            background-color: #ecc94b;
+        }
+        .light-mode .bg-yellow-500:hover {
+            background-color: #d69e2e;
+        }
+        .light-mode .text-yellow-400 {
+            color: #d69e2e;
+        }
+        .light-mode .bg-gray-700 {
+            background-color: #e2e8f0;
+        }
+        .light-mode .bg-gray-700:hover {
+            background-color: #cbd5e0;
+        }
+        .light-mode input, .light-mode select {
+            background-color: #edf2f7;
+            color: #2d3748;
+            border: 1px solid #cbd5e0;
+        }
+    </style>
+</head>
+<body :class="{'light-mode': isLightMode}" v-cloak>
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-gray-800 p-4 flex justify-between items-center shadow-md">
+            <button @click="goBack" class="text-yellow-500 hover:text-yellow-400 transition-colors duration-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            </button>
+            <h1 class="text-xl font-bold text-white">Confirmar Depósito</h1>
+            <button @click="toggleTheme" class="text-gray-400 hover:text-white transition-colors duration-300">
+                <svg v-if="isLightMode" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h1M3 12H2m8.042-8.485l.707-.707M10.95 18.49l-.707.707m8.485-1.414l.707.707M18.49 10.95l.707-.707M18.49 13.05l.707-.707m-1.414-8.485l-.707.707M3 12h1m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 container mx-auto px-4 py-8">
+            <div class="bg-gray-800 rounded-lg shadow-lg p-6 max-w-md mx-auto">
+                <h2 class="text-2xl font-bold text-white mb-6 text-center">Revisa los Detalles de tu Depósito</h2>
+
+                <div class="mb-6">
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="text-gray-400">Criptomoneda:</div>
+                        <div class="text-white font-semibold">{{ crypto }}</div>
+
+                        <div class="text-gray-400">Dirección de Depósito:</div>
+                        <div class="text-white break-all">{{ address }}</div>
+
+                        <div class="text-gray-400">Red:</div>
+                        <div class="text-white">{{ network }}</div>
+
+                        <div class="text-gray-400">Tarifa de Depósito:</div>
+                        <div class="text-green-400 font-semibold">{{ fee }} {{ symbol }}</div>
+                    </div>
+                    <p class="text-gray-500 text-sm">Asegúrate de que todos los detalles sean correctos antes de proceder con el depósito.</p>
+                </div>
+
+                <button @click="confirmDeposit" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-colors duration-300">
+                    Confirmar Depósito
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                isLightMode: false,
+                crypto: '',
+                symbol: '',
+                address: '',
+                network: '',
+                fee: 0.00
+            },
+            methods: {
+                toggleTheme() {
+                    this.isLightMode = !this.isLightMode;
+                    localStorage.setItem('isLightMode', this.isLightMode);
+                },
+                goBack() {
+                    window.history.back();
+                },
+                confirmDeposit() {
+                    alert(`Depósito de ${this.crypto} a la dirección ${this.address} confirmado.`);
+                    // Aquí se enviaría la solicitud final al backend
+                    window.location.href = 'wallets.html'; // Redirigir a la página de wallets o a una de estado de depósito
+                }
+            },
+            mounted() {
+                this.isLightMode = localStorage.getItem('isLightMode') === 'true';
+                const storedDetails = localStorage.getItem('depositDetails');
+                if (storedDetails) {
+                    const details = JSON.parse(storedDetails);
+                    this.crypto = details.crypto;
+                    this.symbol = details.symbol;
+                    this.address = details.address;
+                    this.network = details.network;
+                    this.fee = details.fee;
+                    localStorage.removeItem('depositDetails'); // Limpiar después de usar
+                }
+            }
+        });
+    </script>
+</body>
+</html>
