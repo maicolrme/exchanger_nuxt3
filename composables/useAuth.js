@@ -1,6 +1,5 @@
 // composables/useAuth.js
 import { ref } from 'vue';
-import axios from 'axios';
 
 export const useAuth = () => {
   const user = ref(null);
@@ -17,7 +16,8 @@ export const useAuth = () => {
     error.value = null;
     
     try {
-      const response = await axios.get('/user');
+      const { $axios } = useNuxtApp();
+      const response = await $axios.get('/user');
       user.value = response.data;
       isAuthenticated.value = true;
     } catch (err) {
@@ -37,19 +37,28 @@ export const useAuth = () => {
     error.value = null;
     
     try {
-      const response = await axios.post('/login', { email, password });
+      // Usar la instancia de axios del plugin
+      const { $axios } = useNuxtApp();
+      const response = await $axios.post('/login', { email, password });
       
-      if (response.data.success && response.data.token) {
+      if (response.data.token) {
+        // Guardar token en localStorage
         localStorage.setItem('auth_token', response.data.token);
+        // Actualizar estado de usuario
         user.value = response.data.user;
         isAuthenticated.value = true;
+        console.log('Usuario autenticado:', user.value);
         return true;
       } else {
         throw new Error('Respuesta inválida del servidor');
       }
     } catch (err) {
       console.error('Error de inicio de sesión:', err);
-      error.value = err.response?.data?.message || 'Error al iniciar sesión. Verifique sus credenciales.';
+      if (!err.response) {
+        error.value = 'Error de conexión. Verifique su conexión a internet.';
+      } else {
+        error.value = err.response?.data?.message || 'Error al iniciar sesión. Verifique sus credenciales.';
+      }
       return false;
     } finally {
       loading.value = false;
@@ -62,7 +71,8 @@ export const useAuth = () => {
     error.value = null;
     
     try {
-      const response = await axios.post('/register', {
+      const { $axios } = useNuxtApp();
+      const response = await $axios.post('/register', {
         name,
         email,
         password,
@@ -92,7 +102,8 @@ export const useAuth = () => {
     error.value = null;
     
     try {
-      await axios.post('/logout');
+      const { $axios } = useNuxtApp();
+      await $axios.post('/logout');
     } catch (err) {
       console.error('Error al cerrar sesión:', err);
     } finally {

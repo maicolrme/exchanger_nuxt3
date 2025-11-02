@@ -89,7 +89,8 @@ async function handleLogin() {
   const success = await login(email.value, password.value);
   
   if (success) {
-    router.push('/');
+    // Forzar recarga para actualizar el estado de autenticación en la UI
+    window.location.href = '/';
   } else {
     error.value = authError.value;
   }

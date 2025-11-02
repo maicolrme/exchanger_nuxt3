@@ -29,7 +29,7 @@ export default defineNuxtConfig({
     middleware: ['auth']
   },
   // Configuración de módulos
-  modules: ['@nuxtjs/tailwindcss'],
+  modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
   
   // Configuración de Tailwind CSS
   tailwindcss: {

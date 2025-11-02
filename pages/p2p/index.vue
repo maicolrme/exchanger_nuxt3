@@ -1,12 +1,7 @@
 <template>
   <div>
-    <!-- P2P Banner -->
-    <section class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-gray-900 py-6">
-      <div class="container mx-auto px-4">
-        <h2 class="text-2xl font-bold mb-1">Mercado P2P</h2>
-        <p class="text-sm opacity-90">Compra y vende crypto directamente con otros usuarios</p>
-      </div>
-    </section>
+    <!-- P2P Banner - Profesional y oculto en móviles -->
+    
 
     <!-- Main Content -->
     <section class="py-6 pb-24 md:pb-6">
