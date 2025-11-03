@@ -1,13 +1,13 @@
 <template>
-  <div :class="isLightMode ? 'light-mode' : 'dark-mode'">
+  <div  :class="{'light-mode': isLightMode}">
     <!-- Hero Carousel -->
-    <section class="carousel-container w-full relative overflow-hidden">
+    <section class="carousel-container w-full">
       <div v-for="(slide, index) in slides" :key="index" 
            class="carousel-slide w-full" 
            :class="{'active': currentSlide === index}">
         <div class="py-16 md:py-24 w-full" :class="slide.bgClass">
-          <div class="w-full">
-            <div class="grid md:grid-cols-2 gap-8 items-center max-w-7xl mx-auto px-4">
+          <div class="w-full px-4">
+            <div class="grid md:grid-cols-2 gap-8 items-center max-w-7xl mx-auto">
               <div>
                 <h2 class="text-4xl md:text-5xl font-bold mb-4">{{ slide.title }}</h2>
                 <p class="text-lg md:text-xl text-gray-200 mb-6">{{ slide.description }}</p>
@@ -268,7 +268,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from '#app';
 
 
@@ -277,14 +277,6 @@ const isLightMode = ref(false);
 const showNotification = ref(false);
 const notificationMessage = ref('');
 const currentSlide = ref(0);
-
-// Cargar el tema guardado al iniciar
-onMounted(() => {
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme) {
-    isLightMode.value = savedTheme === 'light';
-  }
-});
 
 
 definePageMeta({
@@ -355,17 +347,6 @@ function showNotificationMessage(message) {
 }
 .carousel-slide.active {
   display: block;
-}
-
-/* Estilos para el tema claro/oscuro */
-:deep(.dark-mode) {
-  background-color: #121212;
-  color: #f5f5f5;
-}
-
-:deep(.light-mode) {
-  background-color: #ffffff;
-  color: #333333;
 }
 @keyframes fadeIn {
   from { opacity: 0; }
