@@ -1,8 +1,5 @@
 <template>
-  <div class="app-layout bg-gray-900 min-h-screen w-full" :class="{'light-mode': isLightMode}" 
-       @touchstart="handleTouchStart" 
-       @touchend="handleTouchEnd"
-       @touchmove="handleTouchMove">
+  <div class="app-layout bg-gray-900 min-h-screen w-full" :class="{'light-mode': isLightMode}">
     <!-- Overlay para cuando el menú está abierto -->
     <div v-if="menuOpen" @click="toggleMenu" class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden transition-opacity duration-300 ease-in-out"></div>
     
@@ -351,128 +348,7 @@ const toggleMenu = () => {
   menuOpen.value = !menuOpen.value;
 };
 
-// Navegación por deslizamiento mejorada con feedback visual
-const navigationRoutes = ['/', '/markets', '/p2p', '/wallet', '/profile'];
-let touchStartX = 0;
-let touchEndX = 0;
-let touchStartY = 0;
-let touchEndY = 0;
-let isSwipeActive = ref(false);
-let swipeProgress = ref(0);
-let swipeDirection = ref('');
-
-const handleTouchStart = (e) => {
-  // Solo en móviles y si no hay menú abierto
-  if (window.innerWidth >= 768 || menuOpen.value) return;
-  
-  touchStartX = e.changedTouches[0].screenX;
-  touchStartY = e.changedTouches[0].screenY;
-  isSwipeActive.value = false;
-  swipeProgress.value = 0;
-  swipeDirection.value = '';
-};
-
-const handleTouchMove = (e) => {
-  // Solo en móviles y si no hay menú abierto
-  if (window.innerWidth >= 768 || menuOpen.value) return;
-  
-  const currentX = e.changedTouches[0].screenX;
-  const currentY = e.changedTouches[0].screenY;
-  const deltaX = currentX - touchStartX;
-  const deltaY = Math.abs(currentY - touchStartY);
-  
-  // Si el movimiento vertical es mayor que el horizontal, no es un swipe horizontal
-  if (deltaY > Math.abs(deltaX)) return;
-  
-  // Activar feedback visual si el movimiento supera 20px
-  if (Math.abs(deltaX) > 20) {
-    isSwipeActive.value = true;
-    swipeDirection.value = deltaX > 0 ? 'right' : 'left';
-    
-    // Calcular progreso del swipe (0-100)
-    const maxSwipe = window.innerWidth * 0.3; // 30% del ancho de pantalla
-    swipeProgress.value = Math.min(Math.abs(deltaX) / maxSwipe * 100, 100);
-    
-    // Agregar clases CSS para feedback visual direccional
-    document.body.classList.add('swipe-active');
-    document.body.classList.add(`swipe-${swipeDirection.value}`);
-    document.body.style.setProperty('--swipe-progress', `${swipeProgress.value}%`);
-  }
-};
-
-const handleTouchEnd = (e) => {
-  // Solo en móviles y si no hay menú abierto
-  if (window.innerWidth >= 768 || menuOpen.value) return;
-  
-  touchEndX = e.changedTouches[0].screenX;
-  touchEndY = e.changedTouches[0].screenY;
-  
-  // Limpiar feedback visual
-  document.body.classList.remove('swipe-active', 'swipe-left', 'swipe-right');
-  document.body.style.removeProperty('--swipe-progress');
-  
-  handleSwipe();
-  
-  // Reset valores
-  isSwipeActive.value = false;
-  swipeProgress.value = 0;
-  swipeDirection.value = '';
-};
-
-const handleSwipe = () => {
-  const swipeThreshold = 80; // Mínima distancia para considerar un swipe
-  const swipeDistanceX = touchEndX - touchStartX;
-  const swipeDistanceY = Math.abs(touchEndY - touchStartY);
-  
-  // Si el movimiento vertical es mayor que el horizontal, no es un swipe horizontal
-  if (swipeDistanceY > Math.abs(swipeDistanceX)) return;
-  
-  // Si no supera el umbral, no hacer nada
-  if (Math.abs(swipeDistanceX) < swipeThreshold) return;
-  
-  const currentIndex = navigationRoutes.indexOf(route.path);
-  if (currentIndex === -1) return;
-  
-  let nextIndex;
-  let transitionName;
-  
-  if (swipeDistanceX > 0) {
-    // Swipe hacia la derecha - ir a la página anterior (izquierda)
-    nextIndex = currentIndex > 0 ? currentIndex - 1 : navigationRoutes.length - 1;
-    transitionName = 'slide-right'; // La nueva página viene desde la izquierda
-  } else {
-    // Swipe hacia la izquierda - ir a la página siguiente (derecha)
-    nextIndex = currentIndex < navigationRoutes.length - 1 ? currentIndex + 1 : 0;
-    transitionName = 'slide-left'; // La nueva página viene desde la derecha
-  }
-  
-  // Configurar la transición direccional
-  const nuxtApp = useNuxtApp();
-  nuxtApp.$router.options.pageTransition = {
-    name: transitionName,
-    mode: 'out-in',
-    duration: 400,
-    css: true
-  };
-  
-  // Agregar clase de transición antes de navegar
-  document.body.classList.add('page-transitioning');
-  
-  // Navegar a la nueva ruta con transición direccional
-  navigateTo(navigationRoutes[nextIndex]);
-  
-  // Remover clase después de la transición y restaurar transición por defecto
-  setTimeout(() => {
-    document.body.classList.remove('page-transitioning');
-    // Restaurar transición por defecto
-    nuxtApp.$router.options.pageTransition = {
-      name: 'slide',
-      mode: 'out-in',
-      duration: 400,
-      css: false
-    };
-  }, 450);
-};
+// Navegación por deslizamiento desactivada
 
 // Función para cerrar sesión
 const handleLogout = async () => {
@@ -585,76 +461,7 @@ body {
   scrollbar-width: none;
 }
 
-/* Feedback visual para deslizamiento estilo Instagram */
-body.swipe-active {
-  overflow-x: hidden;
-}
-
-body.swipe-active::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(251, 191, 36, 0.1) var(--swipe-progress, 0%),
-    transparent 100%
-  );
-  pointer-events: none;
-  z-index: 9999;
-  transition: opacity 0.1s ease;
-}
-
-body.swipe-active[data-swipe-direction="left"]::before {
-  background: linear-gradient(
-    270deg,
-    transparent 0%,
-    rgba(251, 191, 36, 0.1) var(--swipe-progress, 0%),
-    transparent 100%
-  );
-}
-
-/* Indicador de dirección de swipe */
-body.swipe-active::after {
-  content: '';
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 60px;
-  background: rgba(251, 191, 36, 0.8);
-  border-radius: 2px;
-  opacity: calc(var(--swipe-progress, 0%) / 100);
-  transition: opacity 0.1s ease;
-  z-index: 10000;
-}
-
-body.swipe-active[data-swipe-direction="right"]::after {
-  left: 20px;
-  box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
-}
-
-body.swipe-active[data-swipe-direction="left"]::after {
-  right: 20px;
-  box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
-}
-
-/* Transición de página mejorada */
-body.page-transitioning {
-  overflow: hidden;
-}
-
-body.page-transitioning .app-layout {
-  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* Estilos para navegación por deslizamiento */
-.swipe-container {
-  touch-action: pan-y; /* Permite scroll vertical pero controla el horizontal */
-}
+/* Estilos de swipe eliminados */
 
 /* Animación suave para transiciones de página */
 .page-enter-active,
