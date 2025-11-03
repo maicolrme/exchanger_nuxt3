@@ -5,7 +5,7 @@
 
     <!-- Main Content -->
     <section class="py-6 pb-24 md:pb-6">
-      <div class="container mx-auto px-4">
+      <div class="w-full px-4">
         <!-- Buy/Sell Toggle -->
         <div class="flex gap-2 mb-6">
           <button @click="tradeMode = 'buy'" 

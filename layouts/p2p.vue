@@ -1,5 +1,8 @@
 <template>
-  <div class="app-layout bg-gray-900 min-h-screen w-full" :class="{'light-mode': isLightMode}">
+  <div class="app-layout bg-gray-900 min-h-screen w-full" :class="{'light-mode': isLightMode}" 
+       @touchstart="handleTouchStart" 
+       @touchend="handleTouchEnd"
+       @touchmove="handleTouchMove">
     <!-- Overlay para cuando el menú está abierto -->
     <div v-if="menuOpen" @click="toggleMenu" class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden transition-opacity duration-300 ease-in-out"></div>
     
@@ -152,8 +155,8 @@
     </div>
     
     <header class="bg-gray-800 border-b border-gray-700 sticky top-0 z-30">
-      <div class="px-4 py-3 flex items-center justify-between">
-        <div class="flex items-center gap-4">
+      <div class="px-0 py-3 flex items-center justify-between w-full">
+        <div class="flex items-center gap-4 px-4">
           <h1 class="text-xl font-bold text-yellow-400">CryptoEx</h1>
           <div class="hidden md:flex gap-4 text-sm">
             <NuxtLink to="/" class="text-gray-300 hover:text-white">Inicio</NuxtLink>
@@ -162,7 +165,7 @@
             <NuxtLink to="/p2p" class="text-white font-semibold">P2P</NuxtLink>
           </div>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 px-4">
           <!-- Botón de menú para móviles -->
           <button @click="toggleMenu" class="md:hidden text-gray-400 hover:text-white">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -231,36 +234,42 @@
       </div>
     </header>
 
-    <div class="container mx-auto main-content w-full">
+    <div class="main-content w-full">
       <slot />
     </div>
     
    <!-- Bottom Navigation -->
     <nav class="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 md:hidden z-40">
       <div class="flex justify-around py-3">
-        <NuxtLink to="/" class="flex flex-col items-center gap-1">
-          <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <NuxtLink to="/" class="flex flex-col items-center gap-1 bottom-nav-indicator" :class="{ 'text-yellow-400 active': $route.path === '/', 'text-gray-400': $route.path !== '/' }">
+          <svg class="w-6 h-6" :class="{ 'text-yellow-400': $route.path === '/', 'text-gray-400': $route.path !== '/' }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
           </svg>
-          <span class="text-xs text-gray-400">Inicio</span>
+          <span class="text-xs" :class="{ 'text-yellow-400': $route.path === '/', 'text-gray-400': $route.path !== '/' }">Inicio</span>
         </NuxtLink>
-        <NuxtLink to="/markets" class="flex flex-col items-center gap-1">
-          <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <NuxtLink to="/markets" class="flex flex-col items-center gap-1 bottom-nav-indicator" :class="{ 'text-yellow-400 active': $route.path === '/markets', 'text-gray-400': $route.path !== '/markets' }">
+          <svg class="w-6 h-6" :class="{ 'text-yellow-400': $route.path === '/markets', 'text-gray-400': $route.path !== '/markets' }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
           </svg>
-          <span class="text-xs text-gray-400">Mercados</span>
+          <span class="text-xs" :class="{ 'text-yellow-400': $route.path === '/markets', 'text-gray-400': $route.path !== '/markets' }">Mercados</span>
         </NuxtLink>
-        <NuxtLink to="/p2p" class="flex flex-col items-center gap-1">
-          <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <NuxtLink to="/p2p" class="flex flex-col items-center gap-1 bottom-nav-indicator" :class="{ 'text-yellow-400 active': $route.path.startsWith('/p2p'), 'text-gray-400': !$route.path.startsWith('/p2p') }">
+          <svg class="w-6 h-6" :class="{ 'text-yellow-400': $route.path.startsWith('/p2p'), 'text-gray-400': !$route.path.startsWith('/p2p') }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
           </svg>
-          <span class="text-xs text-yellow-400">P2P</span>
+          <span class="text-xs" :class="{ 'text-yellow-400': $route.path.startsWith('/p2p'), 'text-gray-400': !$route.path.startsWith('/p2p') }">P2P</span>
         </NuxtLink>
-        <NuxtLink to="/profile" class="flex flex-col items-center gap-1">
-          <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <NuxtLink to="/wallet" class="flex flex-col items-center gap-1 bottom-nav-indicator" :class="{ 'text-yellow-400 active': $route.path === '/wallet', 'text-gray-400': $route.path !== '/wallet' }">
+          <svg class="w-6 h-6" :class="{ 'text-yellow-400': $route.path === '/wallet', 'text-gray-400': $route.path !== '/wallet' }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+          </svg>
+          <span class="text-xs" :class="{ 'text-yellow-400': $route.path === '/wallet', 'text-gray-400': $route.path !== '/wallet' }">Wallet</span>
+        </NuxtLink>
+        <NuxtLink to="/profile" class="flex flex-col items-center gap-1 bottom-nav-indicator" :class="{ 'text-yellow-400 active': $route.path === '/profile', 'text-gray-400': $route.path !== '/profile' }">
+          <svg class="w-6 h-6" :class="{ 'text-yellow-400': $route.path === '/profile', 'text-gray-400': $route.path !== '/profile' }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
           </svg>
-          <span class="text-xs text-gray-400">Perfil</span>
+          <span class="text-xs" :class="{ 'text-yellow-400': $route.path === '/profile', 'text-gray-400': $route.path !== '/profile' }">Perfil</span>
         </NuxtLink>
       </div>
     </nav>
@@ -268,7 +277,7 @@
     
     <!-- Footer - Oculto en móviles -->
     <footer class="hidden md:block bg-gray-800 border-t border-gray-700 py-12 mt-auto">
-      <div class="container mx-auto px-4">
+      <div class="w-full px-4">
         <div class="grid md:grid-cols-4 gap-8 mb-8">
           <div>
             <h3 class="text-xl font-bold text-yellow-400 mb-4">CryptoEx</h3>
@@ -340,6 +349,129 @@ const changeLanguage = () => {
 // Función para abrir/cerrar el menú móvil
 const toggleMenu = () => {
   menuOpen.value = !menuOpen.value;
+};
+
+// Navegación por deslizamiento mejorada con feedback visual
+const navigationRoutes = ['/', '/markets', '/p2p', '/wallet', '/profile'];
+let touchStartX = 0;
+let touchEndX = 0;
+let touchStartY = 0;
+let touchEndY = 0;
+let isSwipeActive = ref(false);
+let swipeProgress = ref(0);
+let swipeDirection = ref('');
+
+const handleTouchStart = (e) => {
+  // Solo en móviles y si no hay menú abierto
+  if (window.innerWidth >= 768 || menuOpen.value) return;
+  
+  touchStartX = e.changedTouches[0].screenX;
+  touchStartY = e.changedTouches[0].screenY;
+  isSwipeActive.value = false;
+  swipeProgress.value = 0;
+  swipeDirection.value = '';
+};
+
+const handleTouchMove = (e) => {
+  // Solo en móviles y si no hay menú abierto
+  if (window.innerWidth >= 768 || menuOpen.value) return;
+  
+  const currentX = e.changedTouches[0].screenX;
+  const currentY = e.changedTouches[0].screenY;
+  const deltaX = currentX - touchStartX;
+  const deltaY = Math.abs(currentY - touchStartY);
+  
+  // Si el movimiento vertical es mayor que el horizontal, no es un swipe horizontal
+  if (deltaY > Math.abs(deltaX)) return;
+  
+  // Activar feedback visual si el movimiento supera 20px
+  if (Math.abs(deltaX) > 20) {
+    isSwipeActive.value = true;
+    swipeDirection.value = deltaX > 0 ? 'right' : 'left';
+    
+    // Calcular progreso del swipe (0-100)
+    const maxSwipe = window.innerWidth * 0.3; // 30% del ancho de pantalla
+    swipeProgress.value = Math.min(Math.abs(deltaX) / maxSwipe * 100, 100);
+    
+    // Agregar clases CSS para feedback visual direccional
+    document.body.classList.add('swipe-active');
+    document.body.classList.add(`swipe-${swipeDirection.value}`);
+    document.body.style.setProperty('--swipe-progress', `${swipeProgress.value}%`);
+  }
+};
+
+const handleTouchEnd = (e) => {
+  // Solo en móviles y si no hay menú abierto
+  if (window.innerWidth >= 768 || menuOpen.value) return;
+  
+  touchEndX = e.changedTouches[0].screenX;
+  touchEndY = e.changedTouches[0].screenY;
+  
+  // Limpiar feedback visual
+  document.body.classList.remove('swipe-active', 'swipe-left', 'swipe-right');
+  document.body.style.removeProperty('--swipe-progress');
+  
+  handleSwipe();
+  
+  // Reset valores
+  isSwipeActive.value = false;
+  swipeProgress.value = 0;
+  swipeDirection.value = '';
+};
+
+const handleSwipe = () => {
+  const swipeThreshold = 80; // Mínima distancia para considerar un swipe
+  const swipeDistanceX = touchEndX - touchStartX;
+  const swipeDistanceY = Math.abs(touchEndY - touchStartY);
+  
+  // Si el movimiento vertical es mayor que el horizontal, no es un swipe horizontal
+  if (swipeDistanceY > Math.abs(swipeDistanceX)) return;
+  
+  // Si no supera el umbral, no hacer nada
+  if (Math.abs(swipeDistanceX) < swipeThreshold) return;
+  
+  const currentIndex = navigationRoutes.indexOf(route.path);
+  if (currentIndex === -1) return;
+  
+  let nextIndex;
+  let transitionName;
+  
+  if (swipeDistanceX > 0) {
+    // Swipe hacia la derecha - ir a la página anterior (izquierda)
+    nextIndex = currentIndex > 0 ? currentIndex - 1 : navigationRoutes.length - 1;
+    transitionName = 'slide-right'; // La nueva página viene desde la izquierda
+  } else {
+    // Swipe hacia la izquierda - ir a la página siguiente (derecha)
+    nextIndex = currentIndex < navigationRoutes.length - 1 ? currentIndex + 1 : 0;
+    transitionName = 'slide-left'; // La nueva página viene desde la derecha
+  }
+  
+  // Configurar la transición direccional
+  const nuxtApp = useNuxtApp();
+  nuxtApp.$router.options.pageTransition = {
+    name: transitionName,
+    mode: 'out-in',
+    duration: 400,
+    css: true
+  };
+  
+  // Agregar clase de transición antes de navegar
+  document.body.classList.add('page-transitioning');
+  
+  // Navegar a la nueva ruta con transición direccional
+  navigateTo(navigationRoutes[nextIndex]);
+  
+  // Remover clase después de la transición y restaurar transición por defecto
+  setTimeout(() => {
+    document.body.classList.remove('page-transitioning');
+    // Restaurar transición por defecto
+    nuxtApp.$router.options.pageTransition = {
+      name: 'slide',
+      mode: 'out-in',
+      duration: 400,
+      css: false
+    };
+  }, 450);
 };
 
 // Función para cerrar sesión
@@ -451,5 +583,123 @@ body {
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Feedback visual para deslizamiento estilo Instagram */
+body.swipe-active {
+  overflow-x: hidden;
+}
+
+body.swipe-active::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(251, 191, 36, 0.1) var(--swipe-progress, 0%),
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 9999;
+  transition: opacity 0.1s ease;
+}
+
+body.swipe-active[data-swipe-direction="left"]::before {
+  background: linear-gradient(
+    270deg,
+    transparent 0%,
+    rgba(251, 191, 36, 0.1) var(--swipe-progress, 0%),
+    transparent 100%
+  );
+}
+
+/* Indicador de dirección de swipe */
+body.swipe-active::after {
+  content: '';
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 60px;
+  background: rgba(251, 191, 36, 0.8);
+  border-radius: 2px;
+  opacity: calc(var(--swipe-progress, 0%) / 100);
+  transition: opacity 0.1s ease;
+  z-index: 10000;
+}
+
+body.swipe-active[data-swipe-direction="right"]::after {
+  left: 20px;
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+}
+
+body.swipe-active[data-swipe-direction="left"]::after {
+  right: 20px;
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+}
+
+/* Transición de página mejorada */
+body.page-transitioning {
+  overflow: hidden;
+}
+
+body.page-transitioning .app-layout {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Estilos para navegación por deslizamiento */
+.swipe-container {
+  touch-action: pan-y; /* Permite scroll vertical pero controla el horizontal */
+}
+
+/* Animación suave para transiciones de página */
+.page-enter-active,
+.page-leave-active {
+  transition: all 0.3s ease-in-out;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+/* Mejorar la respuesta táctil en móviles */
+@media (max-width: 768px) {
+  .app-layout {
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Indicador visual sutil para swipe */
+  .bottom-nav-indicator {
+    position: relative;
+  }
+  
+  .bottom-nav-indicator::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(251, 191, 36, 0.5), transparent);
+    border-radius: 1px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .bottom-nav-indicator.active::after {
+    opacity: 1;
+  }
 }
 </style>

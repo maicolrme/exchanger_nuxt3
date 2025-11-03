@@ -4,19 +4,29 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   app: {
     head: {
-      title: 'Trading Exchanger',
+      title: 'Exchanger - Plataforma de Intercambio de Criptomonedas',
       meta: [
         { charset: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' }
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { hid: 'description', name: 'description', content: 'Plataforma segura para el intercambio de criptomonedas' }
       ],
       link: [
-      //  { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css' }
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
       ],
       script: [
-        { src: 'https://code.jquery.com/jquery-3.6.0.slim.min.js', body: true },
-        { src: 'https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js', body: true },
-     //   { src: 'https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js', body: true }
+        { src: 'https://js.pusher.com/8.2.0/pusher.min.js' }
       ]
+    },
+    pageTransition: { 
+      name: 'slide', 
+      mode: 'out-in', 
+      duration: 400,
+      css: false
+    },
+    layoutTransition: { 
+      name: 'layout', 
+      mode: 'out-in', 
+      duration: 300 
     }
   },
   // Registrar plugins
@@ -29,7 +39,12 @@ export default defineNuxtConfig({
     middleware: ['auth']
   },
   // Configuración de módulos
-  modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt'],
+  modules: [
+    '@nuxtjs/tailwindcss', 
+    '@pinia/nuxt', 
+    'pinia-plugin-persistedstate/nuxt',
+    '@nuxtjs/device'
+  ],
   
   // Configuración de Tailwind CSS
   tailwindcss: {
