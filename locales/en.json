@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "home": "Home",
+    "markets": "Markets",
+    "p2p": "P2P",
+    "wallet": "My Wallet",
+    "profile": "My Profile",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "account": "My Account",
+    "history": "History"
+  },
+  "btn": {
+    "publish": "Publish Ad",
+    "buy": "Buy",
+    "sell": "Sell",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "form": {
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "amount": "Amount",
+    "price": "Price"
+  },
+  "msg": {
+    "welcome": "Welcome",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "p2p": {
+    "title": "P2P Market",
+    "buy_crypto": "Buy Crypto",
+    "sell_crypto": "Sell Crypto",
+    "payment_method": "Payment Method",
+    "orders": "Orders",
+    "my_orders": "My Orders"
+  },
+  "settings": {
+    "language": "Language",
+    "theme": "Theme",
+    "notifications": "Notifications"
+  }
+}

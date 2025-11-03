@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "markets": "Mercados",
+    "p2p": "P2P",
+    "wallet": "Mi Cartera",
+    "profile": "Mi Perfil",
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar Sesión",
+    "account": "Mi Cuenta",
+    "history": "Historial"
+  },
+  "btn": {
+    "publish": "Publicar Anuncio",
+    "buy": "Comprar",
+    "sell": "Vender",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Guardar",
+    "edit": "Editar",
+    "delete": "Eliminar"
+  },
+  "form": {
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "name": "Nombre",
+    "amount": "Cantidad",
+    "price": "Precio"
+  },
+  "msg": {
+    "welcome": "Bienvenido",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito"
+  },
+  "p2p": {
+    "title": "Mercado P2P",
+    "buy_crypto": "Comprar Crypto",
+    "sell_crypto": "Vender Crypto",
+    "payment_method": "Método de Pago",
+    "orders": "Órdenes",
+    "my_orders": "Mis Órdenes"
+  },
+  "settings": {
+    "language": "Idioma",
+    "theme": "Tema",
+    "notifications": "Notificaciones"
+  }
+}

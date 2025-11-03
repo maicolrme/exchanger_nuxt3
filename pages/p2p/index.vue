@@ -54,7 +54,10 @@
                 </div>
                 <div>
                   <div class="flex items-center gap-2">
-                    <span class="font-semibold">{{ offer.username }}</span>
+                    <NuxtLink :to="`/p2p/user/${offer.username}`" 
+                              class="font-semibold hover:text-yellow-400 transition cursor-pointer">
+                      {{ offer.username }}
+                    </NuxtLink>
                     <svg v-if="offer.verified" class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                     </svg>
@@ -86,11 +89,17 @@
               <span class="text-xs bg-gray-700 px-2 py-1 rounded">{{ offer.payment }}</span>
             </div>
 
-            <button @click="openTrade(offer)" 
-                    :class="tradeMode === 'buy' ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'"
-                    class="w-full py-2.5 rounded-lg font-semibold transition">
-              {{ tradeMode === 'buy' ? 'Comprar' : 'Vender' }}
-            </button>
+            <div class="flex gap-2">
+              <button @click="viewDetails(offer)" 
+                      class="flex-1 bg-gray-700 hover:bg-gray-600 py-2.5 rounded-lg font-semibold transition text-sm">
+                Ver Detalles
+              </button>
+              <button @click="openTrade(offer)" 
+                      :class="tradeMode === 'buy' ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'"
+                      class="flex-1 py-2.5 rounded-lg font-semibold transition text-sm">
+                {{ tradeMode === 'buy' ? 'Comprar' : 'Vender' }}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -117,7 +126,10 @@
                     </div>
                     <div>
                       <div class="flex items-center gap-2">
-                        <span class="font-semibold text-sm">{{ offer.username }}</span>
+                        <NuxtLink :to="`/p2p/user/${offer.username}`" 
+                                  class="font-semibold text-sm hover:text-yellow-400 transition cursor-pointer">
+                          {{ offer.username }}
+                        </NuxtLink>
                         <svg v-if="offer.verified" class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                           <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                         </svg>
@@ -141,11 +153,17 @@
                   <span class="text-xs bg-gray-700 px-2 py-1 rounded">{{ offer.payment }}</span>
                 </td>
                 <td class="py-4 px-4 text-center">
-                  <button @click="openTrade(offer)" 
-                          :class="tradeMode === 'buy' ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'"
-                          class="px-6 py-2 rounded-lg font-semibold text-sm transition">
-                    {{ tradeMode === 'buy' ? 'Comprar' : 'Vender' }}
-                  </button>
+                  <div class="flex gap-2 justify-center">
+                    <button @click="viewDetails(offer)" 
+                            class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg font-semibold text-sm transition">
+                      Ver Detalles
+                    </button>
+                    <button @click="openTrade(offer)" 
+                            :class="tradeMode === 'buy' ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'"
+                            class="px-6 py-2 rounded-lg font-semibold text-sm transition">
+                      {{ tradeMode === 'buy' ? 'Comprar' : 'Vender' }}
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -343,6 +361,11 @@ const calculateCrypto = computed(() => {
 const openTrade = (offer) => {
   selectedOffer.value = offer;
   tradeAmount.value = '';
+};
+
+// Ver detalles del anuncio
+const viewDetails = (offer) => {
+  navigateTo(`/p2p/offer/${offer.id}`);
 };
 
 // Confirmar la operación

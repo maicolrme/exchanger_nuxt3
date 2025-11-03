@@ -1,127 +1,25 @@
 // composables/useAuth.js
-import { ref } from 'vue';
-
 export const useAuth = () => {
-  const user = ref(null);
-  const isAuthenticated = ref(false);
-  const loading = ref(false);
-  const error = ref(null);
-
-  // Cargar usuario desde el token almacenado
-  const loadUser = async () => {
-    const token = localStorage.getItem('auth_token');
-    if (!token) return;
-    
-    loading.value = true;
-    error.value = null;
-    
-    try {
-      const { $axios } = useNuxtApp();
-      const response = await $axios.get('/user');
-      user.value = response.data;
-      isAuthenticated.value = true;
-    } catch (err) {
-      console.error('Error al cargar usuario:', err);
-      localStorage.removeItem('auth_token');
-      user.value = null;
-      isAuthenticated.value = false;
-      error.value = 'Sesión expirada. Por favor inicie sesión nuevamente.';
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  // Iniciar sesión
-  const login = async (email, password) => {
-    loading.value = true;
-    error.value = null;
-    
-    try {
-      // Usar la instancia de axios del plugin
-      const { $axios } = useNuxtApp();
-      const response = await $axios.post('/login', { email, password });
-      
-      if (response.data.token) {
-        // Guardar token en localStorage
-        localStorage.setItem('auth_token', response.data.token);
-        // Actualizar estado de usuario
-        user.value = response.data.user;
-        isAuthenticated.value = true;
-        console.log('Usuario autenticado:', user.value);
-        return true;
-      } else {
-        throw new Error('Respuesta inválida del servidor');
-      }
-    } catch (err) {
-      console.error('Error de inicio de sesión:', err);
-      if (!err.response) {
-        error.value = 'Error de conexión. Verifique su conexión a internet.';
-      } else {
-        error.value = err.response?.data?.message || 'Error al iniciar sesión. Verifique sus credenciales.';
-      }
-      return false;
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  // Registrar usuario
-  const register = async (name, email, password, password_confirmation) => {
-    loading.value = true;
-    error.value = null;
-    
-    try {
-      const { $axios } = useNuxtApp();
-      const response = await $axios.post('/register', {
-        name,
-        email,
-        password,
-        password_confirmation
-      });
-      
-      if (response.data.success && response.data.token) {
-        localStorage.setItem('auth_token', response.data.token);
-        user.value = response.data.user;
-        isAuthenticated.value = true;
-        return true;
-      } else {
-        throw new Error('Respuesta inválida del servidor');
-      }
-    } catch (err) {
-      console.error('Error de registro:', err);
-      error.value = err.response?.data?.message || 'Error al registrar usuario.';
-      return false;
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  // Cerrar sesión
-  const logout = async () => {
-    loading.value = true;
-    error.value = null;
-    
-    try {
-      const { $axios } = useNuxtApp();
-      await $axios.post('/logout');
-    } catch (err) {
-      console.error('Error al cerrar sesión:', err);
-    } finally {
-      localStorage.removeItem('auth_token');
-      user.value = null;
-      isAuthenticated.value = false;
-      loading.value = false;
-    }
-  };
+  const authStore = useAuthStore()
 
   return {
-    user,
-    isAuthenticated,
-    loading,
-    error,
-    loadUser,
-    login,
-    register,
-    logout
-  };
-};
+    // Estado reactivo del store
+    user: computed(() => authStore.user),
+    token: computed(() => authStore.token),
+    loading: computed(() => authStore.loading),
+    error: computed(() => authStore.error),
+    isAuthenticated: computed(() => authStore.isAuthenticated),
+    userName: computed(() => authStore.userName),
+    userEmail: computed(() => authStore.userEmail),
+    isVerified: computed(() => authStore.isVerified),
+
+    // Acciones del store
+    initializeAuth: authStore.initializeAuth,
+    loadUser: authStore.loadUser,
+    login: authStore.login,
+    register: authStore.register,
+    logout: authStore.logout,
+    clearAuth: authStore.clearAuth,
+    clearError: authStore.clearError
+  }
+}

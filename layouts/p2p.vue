@@ -20,30 +20,35 @@
         <div v-if="isAuthenticated" class="p-4 border-b border-gray-700">
           <div class="flex items-center space-x-3">
             <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-yellow-400">
-              {{ user?.name?.charAt(0).toUpperCase() || 'U' }}
+              <span v-if="user?.name">{{ user.name.charAt(0).toUpperCase() }}</span>
+              <span v-else>U</span>
             </div>
             <div>
-              <div class="font-medium text-white">{{ user?.name }}</div>
+              <div class="font-medium text-white">
+                <span v-if="user?.name">{{ user.name }}</span>
+                <span v-else>Usuario</span>
+              </div>
               <div class="text-xs text-gray-400">{{ user?.email || '' }}</div>
             </div>
           </div>
         </div>
         
         <!-- Enlaces de navegación -->
+       <!-- Enlaces de navegación -->
         <nav class="p-4">
           <div class="space-y-4">
             <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Navegación</div>
-            <NuxtLink to="/markets" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-lg transition">
+            <NuxtLink to="/" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-lg transition">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
               </svg>
-              <span>Mercados</span>
+              <span>Inicio</span>
             </NuxtLink>
-            <NuxtLink to="/trade" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-lg transition">
+            <NuxtLink to="/markets" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-lg transition">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
               </svg>
-              <span>Trading</span>
+              <span>Markets</span>
             </NuxtLink>
             <NuxtLink to="/p2p" class="flex items-center space-x-3 text-white bg-gray-700 p-2 rounded-lg transition">
               <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -140,7 +145,7 @@
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
-            Publicar Anuncio
+            {{ 'Publicar Anuncio' }}
           </NuxtLink>
         </div>
       </div>
@@ -151,8 +156,9 @@
         <div class="flex items-center gap-4">
           <h1 class="text-xl font-bold text-yellow-400">CryptoEx</h1>
           <div class="hidden md:flex gap-4 text-sm">
+            <NuxtLink to="/" class="text-gray-300 hover:text-white">Inicio</NuxtLink>
             <NuxtLink to="/markets" class="text-gray-300 hover:text-white">Mercados</NuxtLink>
-            <NuxtLink to="/trade" class="text-gray-300 hover:text-white">Trading</NuxtLink>
+            
             <NuxtLink to="/p2p" class="text-white font-semibold">P2P</NuxtLink>
           </div>
         </div>
@@ -178,7 +184,8 @@
           <div v-else class="hidden md:flex items-center gap-2">
             <div class="relative group">
               <button class="flex items-center gap-1 text-xs px-3 py-1.5 bg-gray-700 text-white rounded font-semibold hover:bg-gray-600 transition">
-                <span>{{ user?.name }}</span>
+                <span v-if="user?.name">{{ user.name }}</span>
+                <span v-else>Usuario</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
@@ -228,20 +235,20 @@
       <slot />
     </div>
     
-    <!-- Bottom Navigation -->
+   <!-- Bottom Navigation -->
     <nav class="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 md:hidden z-40">
       <div class="flex justify-around py-3">
-        <NuxtLink to="/markets" class="flex flex-col items-center gap-1">
+        <NuxtLink to="/" class="flex flex-col items-center gap-1">
           <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
           </svg>
-          <span class="text-xs text-gray-400">Mercados</span>
+          <span class="text-xs text-gray-400">Inicio</span>
         </NuxtLink>
-        <NuxtLink to="/trade" class="flex flex-col items-center gap-1">
+        <NuxtLink to="/markets" class="flex flex-col items-center gap-1">
           <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
           </svg>
-          <span class="text-xs text-gray-400">Trading</span>
+          <span class="text-xs text-gray-400">Mercados</span>
         </NuxtLink>
         <NuxtLink to="/p2p" class="flex flex-col items-center gap-1">
           <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -257,6 +264,7 @@
         </NuxtLink>
       </div>
     </nav>
+
     
     <!-- Footer - Oculto en móviles -->
     <footer class="hidden md:block bg-gray-800 border-t border-gray-700 py-12 mt-auto">
@@ -303,12 +311,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { useAuth } from '~/composables/useAuth';
 
-// Obtener estado de autenticación
-const { user, isAuthenticated, loadUser, logout } = useAuth();
+// Obtener estado de autenticación directamente del store
+const authStore = useAuthStore();
+const user = computed(() => authStore.user);
+const isAuthenticated = computed(() => authStore.isAuthenticated);
 
 // Estado para el tema
 const isLightMode = ref(false);
@@ -322,10 +331,10 @@ const toggleTheme = () => {
   localStorage.setItem('theme', isLightMode.value ? 'light' : 'dark');
 };
 
-// Función para cambiar el idioma
+// Función para cambiar el idioma (sin funcionalidad por ahora)
 const changeLanguage = () => {
-  // Aquí se implementaría la lógica para cambiar el idioma
-  console.log('Idioma cambiado a:', selectedLanguage.value);
+  localStorage.setItem('locale', selectedLanguage.value);
+  console.log('Idioma seleccionado:', selectedLanguage.value);
 };
 
 // Función para abrir/cerrar el menú móvil
@@ -335,7 +344,7 @@ const toggleMenu = () => {
 
 // Función para cerrar sesión
 const handleLogout = async () => {
-  await logout();
+  await authStore.logout();
   window.location.href = '/login';
 };
 
@@ -351,8 +360,14 @@ onMounted(() => {
     isLightMode.value = savedTheme === 'light';
   }
   
-  // Cargar información del usuario
-  loadUser();
+  // Inicializar idioma desde localStorage
+  const savedLocale = localStorage.getItem('locale') || 'es';
+  selectedLanguage.value = savedLocale;
+  
+  // Cargar información del usuario solo si hay token y no hay usuario
+  if (process.client && authStore.token && !authStore.user) {
+    authStore.loadUser();
+  }
 });
 </script>
 
