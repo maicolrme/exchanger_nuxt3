@@ -97,6 +97,13 @@
                 </svg>
                 <span>Historial</span>
               </NuxtLink>
+              <NuxtLink to="/notifications" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-lg transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                </svg>
+                <span>Notificaciones</span>
+                <span v-if="unreadCount > 0" class="ml-auto text-[10px] px-1.5 py-0.5 bg-yellow-500 text-gray-900 rounded-full font-bold leading-none">{{ unreadCount }}</span>
+              </NuxtLink>
               <a href="#" @click.prevent="handleLogout" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-lg transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
@@ -151,7 +158,7 @@
       </div>
     </div>
     
-    <header class="bg-gray-800 border-b border-gray-700 sticky top-0 z-30">
+    <header class="bg-gray-800 border-b border-gray-700 fixed top-0 left-0 right-0 z-30 w-full">
       <div class="px-0 py-3 flex items-center justify-between w-full">
         <div class="flex items-center gap-4 px-4">
           <h1 class="text-xl font-bold text-yellow-400">CryptoEx</h1>
@@ -194,6 +201,10 @@
                 <NuxtLink to="/profile" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Mi Perfil</NuxtLink>
                 <NuxtLink to="/wallet" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Mi Cartera</NuxtLink>
                 <NuxtLink to="/orders/history" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Historial</NuxtLink>
+                <NuxtLink to="/notifications" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
+                  Notificaciones
+                  <span v-if="unreadCount > 0" class="ml-2 text-xs px-1.5 py-0.5 bg-yellow-500 text-gray-900 rounded font-bold">{{ unreadCount }}</span>
+                </NuxtLink>
                 <div class="border-t border-gray-700 my-1"></div>
                 <a href="#" @click.prevent="handleLogout" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Cerrar Sesión</a>
               </div>
@@ -223,6 +234,14 @@
             </div>
           </div>
           
+          <!-- Icono de Notificaciones (solo en desktop y si está autenticado) -->
+          <NuxtLink v-if="isAuthenticated" to="/notifications" aria-label="Notificaciones" class="hidden md:block relative text-gray-400 hover:text-white transition-colors duration-300">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+            </svg>
+            <span v-if="unreadCount > 0" class="absolute -top-1 -right-1 text-[10px] px-1.5 py-0.5 bg-yellow-500 text-gray-900 rounded-full font-bold leading-none">{{ unreadCount }}</span>
+          </NuxtLink>
+
           <!-- Botón de publicar -->
           <NuxtLink to="/p2p/publish" class="text-xs px-3 py-1.5 bg-yellow-500 text-gray-900 rounded font-semibold hover:bg-yellow-400">
             Publicar
@@ -231,7 +250,7 @@
       </div>
     </header>
 
-    <div class="main-content w-full">
+    <div class="main-content w-full mt-16">
       <slot />
     </div>
     
@@ -510,3 +529,6 @@ body {
   }
 }
 </style>
+// Store de notificaciones para badge
+const notifStore = useNotificationsStore();
+const unreadCount = computed(() => notifStore.unreadCount);
