@@ -10,12 +10,12 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@nuxtjs/device": "^3.2.4",
     "@nuxtjs/i18n": "^8.0.0-beta.13",
     "@pinia/nuxt": "^0.11.2",
     "axios": "^1.6.2",
     "chart.js": "^4.4.1",
     "chartjs-chart-financial": "^0.2.1",
+    "mobile-detect": "^1.4.5",
     "nuxt": "^3.17.4",
     "pinia": "^3.0.3",
     "pinia-plugin-persistedstate": "^4.7.1",

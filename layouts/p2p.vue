@@ -428,7 +428,7 @@ body {
 
 .main-content {
   flex: 1;
-  padding: 20px 0;
+  padding: 0px 0;
 }
 
 /* Estilos para el modo claro/oscuro */

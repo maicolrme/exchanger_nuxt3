@@ -123,24 +123,28 @@ const chartData = [
  * en si el modo claro está activo o no (detectado desde el body).
  */
 function getChartOptions() {
-  const isLight = document.body.classList.contains('light-mode');
+  // Verificamos si el tema es oscuro (dark-mode) o si NO tiene light-mode
+  // Esto asegura que detectemos correctamente el tema actual
+  const isDark = document.body.classList.contains('dark-mode') || 
+                !document.body.classList.contains('light-mode');
+  
   return {
     layout: {
-      background: { color: isLight ? '#FFFFFF' : '#2d3748' }, // bg-gray-800
-      textColor: isLight ? '#1a1a1a' : '#E2E8F0', // text-gray-200
+      background: { color: isDark ? '#2d3748' : '#FFFFFF' }, // bg-gray-800 o blanco
+      textColor: isDark ? '#E2E8F0' : '#1a1a1a', // text-gray-200 o negro
     },
     grid: {
-      vertLines: { color: isLight ? '#E5E5E5' : '#4A5568' }, // border-gray-700
-      horzLines: { color: isLight ? '#E5E5E5' : '#4A5568' },
+      vertLines: { color: isDark ? '#4A5568' : '#E5E5E5' }, // border-gray-700 o gris claro
+      horzLines: { color: isDark ? '#4A5568' : '#E5E5E5' },
     },
     crosshair: {
       mode: LightweightCharts.CrosshairMode.Normal,
     },
     rightPriceScale: {
-      borderColor: isLight ? '#E5E5E5' : '#4A5568',
+      borderColor: isDark ? '#4A5568' : '#E5E5E5',
     },
     timeScale: {
-      borderColor: isLight ? '#E5E5E5' : '#4A5568',
+      borderColor: isDark ? '#4A5568' : '#E5E5E5',
     },
   };
 }
@@ -188,7 +192,22 @@ function initChart() {
   themeObserver = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
       if (mutation.attributeName === 'class') {
-        chart.applyOptions(getChartOptions());
+        // Aplicamos las nuevas opciones basadas en el tema actual
+        const newOptions = getChartOptions();
+        chart.applyOptions(newOptions);
+        
+        // Forzamos una actualización completa del gráfico
+        candleSeries.applyOptions({
+          upColor: '#0ecb81',
+          downColor: '#f6465d',
+          borderDownColor: '#f6465d',
+          borderUpColor: '#0ecb81',
+          wickDownColor: '#f6465d',
+          wickUpColor: '#0ecb81',
+        });
+        
+        // Redibujamos el gráfico
+        chart.timeScale().fitContent();
       }
     }
   });
