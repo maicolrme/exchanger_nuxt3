@@ -207,7 +207,7 @@ function cancelOrder(orderId: number) {
     </header>
 
     <div :class="isDark ? 'bg-gray-900' : 'bg-gray-50'" class="transition-colors duration-300">
-      <div class="px-4 py-4 space-y-4">
+      <div class="px-4 pt-4 pb-20 space-y-4">
         
         <!-- Order Book -->
         <div :class="isDark ? 'bg-gray-800' : 'bg-white'" class="rounded-lg overflow-hidden">
