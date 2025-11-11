@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 
 // --- Metadatos de la página (reemplaza <head>) ---
 useHead({
@@ -15,10 +15,43 @@ useHead({
 
 
 
-setPageLayout('p2p_no_navbar');
+setPageLayout('p2p');
 
 // --- Estado Reactivo (antes 'data') ---
-const isDark = ref(true);
+// Sincroniza el tema con el layout `p2p` observando su clase `light-mode` y localStorage
+const isLightMode = ref(false);
+const isDark = computed(() => !isLightMode.value);
+let themeObserver: MutationObserver | null = null;
+
+onMounted(() => {
+  if (process.client) {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      isLightMode.value = savedTheme === 'light';
+    }
+
+    const rootEl = document.querySelector('.app-layout');
+    if (rootEl) {
+      // Estado inicial basado en la clase del layout
+      isLightMode.value = rootEl.classList.contains('light-mode');
+
+      // Observar cambios de clase para reflejar el toggle del layout
+      themeObserver = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+          if (m.type === 'attributes' && m.attributeName === 'class') {
+            isLightMode.value = (m.target as HTMLElement).classList.contains('light-mode');
+          }
+        }
+      });
+      themeObserver.observe(rootEl, { attributes: true, attributeFilter: ['class'] });
+    }
+  }
+});
+
+onUnmounted(() => {
+  themeObserver?.disconnect();
+  themeObserver = null;
+});
 const selectedPair = ref('BTC/USDT');
 const currentPrice = ref('67,234.50'); // Mantenido como string para simular el original
 const priceChange = ref(2.45);
@@ -148,27 +181,8 @@ function cancelOrder(orderId: number) {
 <template>
   <div>
     <!-- Header Sticky -->
-    <header :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'" class="sticky top-0 z-50 border-b transition-colors duration-300">
-      <div class="px-4 py-3 flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-          <div class="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center font-bold text-gray-900">
-            CE
-          </div>
-          <span :class="isDark ? 'text-white' : 'text-gray-900'" class="font-bold text-lg">CryptoEx</span>
-        </div>
-        
-        <!-- Toggle Switch -->
-        <button @click="isDark = !isDark" :class="isDark ? 'bg-gray-700' : 'bg-gray-200'" class="relative w-14 h-7 rounded-full transition-colors duration-300">
-          <div :class="isDark ? 'translate-x-7 bg-yellow-500' : 'translate-x-1 bg-gray-400'" class="absolute top-1 left-0 w-5 h-5 rounded-full transition-transform duration-300 flex items-center justify-center">
-            <svg v-if="isDark" class="w-3 h-3 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
-            </svg>
-            <svg v-else class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
-            </svg>
-          </div>
-        </button>
-      </div>
+    <header :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'" class="sticky top-16 z-20 border-b transition-colors duration-300">
+      
 
       <!-- Par de trading -->
       <div :class="isDark ? 'bg-gray-750 border-gray-700' : 'bg-gray-100 border-gray-200'" class="px-4 py-2 border-t">

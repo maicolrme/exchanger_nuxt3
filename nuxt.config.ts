@@ -32,8 +32,7 @@ export default defineNuxtConfig({
   // Registrar plugins
   plugins: [
     '~/plugins/axios.js',
-    '~/plugins/pusher.js',
-    '~/plugins/mobile-detect.js'
+    '~/plugins/pusher.js'
   ],
   // Configuración de rutas
   router: {
@@ -43,8 +42,8 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss', 
     '@pinia/nuxt', 
-    'pinia-plugin-persistedstate/nuxt',
-    //'@nuxtjs/device'
+    'pinia-plugin-persistedstate/nuxt'
+    
   ],
   
   // Configuración de Tailwind CSS

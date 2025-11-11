@@ -1,7 +1,7 @@
 <template>
   <div  :class="{'light-mode': isLightMode}">
     <!-- Hero Carousel -->
-    <section style="margin-top :-12px;" class="carousel-container w-full">
+    <section class="carousel-container w-full">
       <div v-for="(slide, index) in slides" :key="index" 
            class="carousel-slide w-full" 
            :class="{'active': currentSlide === index}">
