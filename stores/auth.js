@@ -52,7 +52,7 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         const { $axios } = useNuxtApp()
-        const response = await $axios.post('/login', { email, password })
+        const response = await $axios.post('/auth/login', { email, password })
 
         if (response.data.token) {
           this.token = response.data.token
@@ -83,7 +83,7 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         const { $axios } = useNuxtApp()
-        const response = await $axios.post('/register', {
+        const response = await $axios.post('/auth/register', {
           name,
           email,
           password,

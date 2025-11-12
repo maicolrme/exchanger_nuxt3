@@ -112,7 +112,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useP2pStore } from '~/store/p2p'
+import { useP2pStore } from '~/stores/p2p'
 
 // Definir el layout
 definePageMeta({
