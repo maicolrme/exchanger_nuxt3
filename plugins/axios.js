@@ -8,10 +8,10 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 
   // Configuración base de Axios
-  const isDev = process.env.NODE_ENV === 'development';
-  
+  const runtimeConfig = useRuntimeConfig();
+
   const axiosInstance = axios.create({
-    baseURL: isDev ? 'http://exchanger.test/api' : 'https://api.cryptoex.com/api',
+    baseURL: runtimeConfig.public.apiBase,
     headers: {
       'Content-Type': 'application/json'
     },

@@ -46,5 +46,16 @@
     "language": "Language",
     "theme": "Theme",
     "notifications": "Notifications"
+  },
+  "common": {
+    "loading": "Loading...",
+    "close": "Close"
+  },
+  "payment": {
+    "select_method": "Select payment method",
+    "select_a_method": "Select a Payment Method",
+    "search_method": "Search payment method",
+    "popular_methods": "Popular Methods",
+    "no_methods_found": "No payment methods found."
   }
 }

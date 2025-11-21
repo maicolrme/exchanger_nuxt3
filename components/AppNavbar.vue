@@ -9,9 +9,10 @@
       
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
+          <li class="nav-item">
             <NuxtLink class="nav-link" to="/markets">Mercados</NuxtLink>
           </li>
+          
           
           <!-- Opciones para usuarios no autenticados -->
           <template v-if="!isAuthenticated">

@@ -97,6 +97,25 @@
                 </svg>
                 <span>Mi Cartera</span>
               </NuxtLink>
+
+
+              <NuxtLink to="/p2p/trades" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-lg transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                </svg>
+                <span>P2p Trade</span>
+              </NuxtLink>
+
+              <NuxtLink to="/p2p/myofferts" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-lg transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                </svg>
+                <span>P2p My offerts</span>
+              </NuxtLink>
+
+
+
+
               <NuxtLink to="/orders/history" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-lg transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -207,6 +226,13 @@
               <div class="absolute right-0 mt-1 w-48 bg-gray-800 border border-gray-700 rounded shadow-lg hidden group-hover:block z-50">
                 <NuxtLink to="/profile" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Mi Perfil</NuxtLink>
                 <NuxtLink to="/wallet" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Mi Cartera</NuxtLink>
+
+
+                 <NuxtLink to="/p2p/trades" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">P2p Trades</NuxtLink>
+
+                  <NuxtLink to="/p2p/myofferts" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">P2p My Offerts </NuxtLink>
+
+
                 <NuxtLink to="/orders/history" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Historial</NuxtLink>
                 <NuxtLink to="/notifications" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
                   Notificaciones

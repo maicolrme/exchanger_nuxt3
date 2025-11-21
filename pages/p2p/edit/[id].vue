@@ -1,14 +1,11 @@
 <template>
   <div class="container mx-auto px-4 py-6">
-    <h2 class="text-3xl font-bold text-center mb-8">Publicar Nuevo Anuncio P2P</h2>
+    <h2 class="text-3xl font-bold text-center mb-8">Editar Anuncio P2P</h2>
     <div class="bg-gray-800 rounded-lg p-6 max-w-2xl mx-auto">
-      <form @submit.prevent="publishAd" class="space-y-6">
-
-
-
-       
-
-
+      <div v-if="adNotFound" class="bg-red-900/50 text-red-200 p-3 rounded-lg mb-4">
+        No se encontró el anuncio solicitado.
+      </div>
+      <form v-if="!adNotFound" @submit.prevent="saveChanges" class="space-y-6">
 
         <!-- Tipo de Anuncio -->
         <div>
@@ -25,24 +22,13 @@
 
         <!-- Criptomoneda -->
         <div>
-          <label for="crypto" class="block text-sm font-medium text-gray-300 mb-2">Criptomoneda:</label>
-          <select id="crypto" v-model="p2pStore.formData.crypto" class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
-            <option disabled value="">Seleccione una criptomoneda</option>
-            <option v-for="c in p2pStore.cryptoCoins" :key="c.id" :value="c.symbol || c.name">
-              {{ c.name || c.symbol }}
-            </option>
-          </select>
-        </div>
-
-        <!-- Moneda Fiat -->
-        <div>
-          <label for="fiat" class="block text-sm font-medium text-gray-300 mb-2">Moneda Fiat:</label>
-          <select id="fiat" v-model="p2pStore.formData.fiatId" class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
-            <option disabled value="">Seleccione una moneda fiat</option>
-            <option v-for="f in p2pStore.fiatCoins" :key="f.id" :value="f.id">
-              {{ f.name || f.code }}
-            </option>
-          </select>
+  <label for="crypto" class="block text-sm font-medium text-gray-300 mb-2">Criptomoneda:</label>
+  <select id="crypto" v-model="p2pStore.formData.crypto" class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
+    <option disabled value="">Seleccione una criptomoneda</option>
+    <option v-for="c in p2pStore.cryptoCoins" :key="c.id" :value="c.symbol || c.name">
+      {{ c.name || c.symbol }}
+    </option>
+  </select>
         </div>
 
         <!-- Cantidad -->
@@ -57,7 +43,16 @@
           </div>
         </div>
 
-       
+        <!-- Moneda Fiat -->
+        <div>
+          <label for="fiat" class="block text-sm font-medium text-gray-300 mb-2">Moneda Fiat:</label>
+          <select id="fiat" v-model="p2pStore.formData.fiatId" class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
+            <option disabled value="">Seleccione una moneda fiat</option>
+            <option v-for="f in p2pStore.fiatCoins" :key="f.id" :value="f.id">
+              {{ f.name || f.code }}
+            </option>
+          </select>
+        </div>
 
         <!-- Tipo de Precio -->
         <div>
@@ -94,8 +89,7 @@
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-2">Métodos de Pago:</label>
           <div class="grid grid-cols-2 gap-2">
-           
-             <P2pPaymentMethodInput v-model="selectedPaymentId"/>
+            <P2pPaymentMethodInput v-model="selectedPaymentId"/>
           </div>
         </div>
 
@@ -112,44 +106,41 @@
         </div>
 
         <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 rounded-lg transition">
-          Publicar Anuncio
+          Guardar Cambios
         </button>
       </form>
     </div>
   </div>
-</template>
+ </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useP2pStore } from '~/stores/p2p'
+import { useMyOffers } from '~/composables/useMyOffers'
+import { usePaymentMethods } from '~/composables/usePaymentMethods'
 import { useNuxtApp } from '#app'
 
+definePageMeta({
+  layout: 'p2p'
+})
 
-// Definir el layout
-
-
+const route = useRoute()
 const p2pStore = useP2pStore()
 const validationErrors = ref([])
-const selectedPaymentId = ref(null);
-// Listas y estado provienen del store
+const selectedPaymentId = ref(null)
+const adNotFound = ref(false)
+
+const { paymentMethods, fetchPaymentMethods } = usePaymentMethods()
+const { offers, fetchMyOffers, updateOffer } = useMyOffers()
+
+const adId = computed(() => Number(route.params.id))
 
 const selectedFiatName = computed(() => {
   const id = p2pStore.formData.fiatId
   if (!id) return p2pStore.formData.fiat
   const found = p2pStore.fiatCoins.find(c => c.id === id)
   return (found?.name || found?.code) || p2pStore.formData.fiat
-})
-
-
-
-onMounted(() => {
-  // Inicializar el tema
-  p2pStore.initTheme()
-  // Resetear el formulario
-  p2pStore.resetForm()
-  // Cargar métodos de pago desde backend
-  loadFiats()
-  loadCoins()
 })
 
 const { $axios } = useNuxtApp()
@@ -173,69 +164,69 @@ const loadCoins = async () => {
     const list = Array.isArray(resp?.data?.data) ? resp.data.data : (Array.isArray(resp?.data) ? resp.data : [])
 
     const isFiat = (c) => (c.decimal_places === 2 || c.offLedger === 1 || !c.network)
-    const fiats = list.filter(isFiat)
     const cryptos = list.filter(c => !isFiat(c))
 
     p2pStore.cryptoCoins = cryptos
-
-    // No tocar fiatCoins aquí; se cargan desde /currency
   } catch (e) {
     console.error('No se pudo cargar /coin', e)
   }
 }
 
-const resolveCryptoId = () => {
-  const sel = p2pStore.formData.crypto
-  const found = p2pStore.cryptoCoins.find(c => c.symbol === sel || c.name === sel)
-  return found?.id ?? null
-}
-
-const publishAd = async () => {
-  // Limpiar errores previos, delegar validación al backend (Laravel)
-  validationErrors.value = []
-
-  const payload = {
-    type: p2pStore.formData.type,
-    price: p2pStore.formData.price,
-    min_amount: p2pStore.formData.minAmount,
-    max_amount: p2pStore.formData.maxAmount,
-    time_limit: p2pStore.formData.paymentWindow,
-    terms: p2pStore.formData.terms,
-    // precio variable opcional
-    price_premium: p2pStore.formData.priceType === 'variable' ? p2pStore.formData.pricePremium : undefined,
-    // IDs requeridos por backend
-    currency_id: resolveCryptoId(),
-    fiat_currency_id: p2pStore.formData.fiatId,
-    payment_method_id: selectedPaymentId.value
+onMounted(async () => {
+  p2pStore.initTheme()
+  p2pStore.resetForm()
+  // Cargar listas dinámicas de monedas desde endpoints consistentes con publish
+  await loadFiats()
+  await loadCoins()
+  // Cargar ofertas y mapear la existente
+  await fetchMyOffers()
+  const list = offers.value || []
+  const existing = list.find(a => a.id === adId.value)
+  if (!existing) {
+    adNotFound.value = true
+    return
   }
+  // Mapear datos del anuncio al formulario
+  p2pStore.formData.type = existing.type
+  p2pStore.formData.crypto = existing.crypto
+  p2pStore.formData.minAmount = existing.minLimit ?? existing.minAmount ?? 0
+  p2pStore.formData.maxAmount = existing.maxLimit ?? existing.maxAmount ?? 0
+  p2pStore.formData.fiat = existing.fiat
+  // Intentar resolver fiatId a partir de code/name
+  const matchFiat = p2pStore.fiatCoins.find(c => c.code === existing.fiat || c.name === existing.fiat || c.symbol === existing.fiat)
+  if (matchFiat) {
+    p2pStore.formData.fiatId = matchFiat.id
+  } else if (!p2pStore.formData.fiatId && p2pStore.fiatCoins.length > 0) {
+    p2pStore.formData.fiatId = p2pStore.fiatCoins[0].id
+  }
+  p2pStore.formData.priceType = p2pStore.formData.priceType || 'fixed'
+  p2pStore.formData.price = existing.price ?? p2pStore.formData.price
+  p2pStore.formData.pricePremium = p2pStore.formData.pricePremium ?? 0
+  p2pStore.formData.paymentWindow = p2pStore.formData.paymentWindow ?? 15
+  p2pStore.formData.terms = existing.terms ?? ''
 
+  await fetchPaymentMethods()
+})
+
+const { validateAdForm } = p2pStore
+
+const saveChanges = async () => {
+  // Alinear validación con el componente de métodos de pago
+  p2pStore.formData.paymentMethods = selectedPaymentId.value ? [selectedPaymentId.value] : []
+
+  const validation = validateAdForm()
+  if (!validation.isValid) {
+    validationErrors.value = validation.errors
+    return
+  }
+  validationErrors.value = []
   try {
-    const resp = await $axios.post('/p2p/offers', payload)
-    const created = resp?.data?.data || resp?.data
-    if (created) {
-      alert('Anuncio publicado con éxito!')
-      // Resetear el formulario
-      p2pStore.resetForm()
-      selectedPaymentId.value = null
-      // Redirigir a la página de P2P
-      navigateTo('/p2p/myofferts')
-    } else {
-      alert('Respuesta inesperada del servidor')
-    }
+    // Enviar nombre/código de fiat y el id (currency_id) vía composable
+    await updateOffer(adId.value, { ...p2pStore.formData, fiat: selectedFiatName.value })
+    alert('Anuncio actualizado con éxito!')
+    navigateTo('/p2p/myofferts')
   } catch (e) {
-    const data = e?.response?.data
-    const msgs = []
-    if (data?.errors && typeof data.errors === 'object') {
-      for (const k of Object.keys(data.errors)) {
-        const arr = Array.isArray(data.errors[k]) ? data.errors[k] : [String(data.errors[k])]
-        msgs.push(...arr)
-      }
-    } else if (data?.message) {
-      msgs.push(data.message)
-    } else {
-      msgs.push('No se pudo publicar el anuncio')
-    }
-    validationErrors.value = msgs
+    alert('No se pudo actualizar el anuncio')
   }
 }
 </script>
