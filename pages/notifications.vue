@@ -5,7 +5,6 @@ import { useNotificationsStore } from '@/stores/notifications'
 //import { MoreHorizontal, Trash2, Check, Mail, X, Loader } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 
-definePageMeta({ layout: 'p2p' })
 
 const notificationsStore = useNotificationsStore()
 const router = useRouter()

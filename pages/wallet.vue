@@ -182,9 +182,6 @@
 
 <script setup>
 // Configurar layout
-definePageMeta({
-  layout: 'p2p'
-})
 
 // Estado reactivo
 const showBalance = ref(true)

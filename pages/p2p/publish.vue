@@ -22,34 +22,22 @@
 
         <div>
           <label for="crypto" class="block text-sm font-medium text-gray-300 mb-2">Criptomoneda:</label>
-          <select id="crypto" v-model="form.crypto"
-            class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
-            <option disabled value="">Seleccione una criptomoneda</option>
-            <option v-for="c in cryptoCoins" :key="c.id" :value="c.symbol || c.name">
-              {{ c.name || c.symbol }}
-            </option>
-          </select>
+          <CryptoInput v-model="form.crypto_currency_id" />
         </div>
 
         <div>
           <label for="fiat" class="block text-sm font-medium text-gray-300 mb-2">Moneda Fiat:</label>
-          <select id="fiat" v-model="form.fiatId"
-            class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
-            <option disabled value="">Seleccione una moneda fiat</option>
-            <option v-for="f in fiatCoins" :key="f.id" :value="f.id">
-              {{ f.name || f.code }}
-            </option>
-          </select>
+          <FiatInput v-model="form.fiat_currency_id" />
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label for="min-amount" class="block text-sm font-medium text-gray-300 mb-2">Cantidad Mínima ({{ form.crypto }}):</label>
+            <label for="min-amount" class="block text-sm font-medium text-gray-300 mb-2">Cantidad Mínima ({{ selectedCryptoSymbol }}):</label>
             <input type="number" id="min-amount" v-model.number="form.minAmount" placeholder="Ej: 0.001" step="any"
               class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
           </div>
           <div>
-            <label for="max-amount" class="block text-sm font-medium text-gray-300 mb-2">Cantidad Máxima ({{ form.crypto }}):</label>
+            <label for="max-amount" class="block text-sm font-medium text-gray-300 mb-2">Cantidad Máxima ({{ selectedCryptoSymbol }}):</label>
             <input type="number" id="max-amount" v-model.number="form.maxAmount" placeholder="Ej: 1.0" step="any"
               class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
           </div>
@@ -72,7 +60,7 @@
         </div>
 
         <div v-if="form.priceType === 'fixed'">
-          <label for="price" class="block text-sm font-medium text-gray-300 mb-2">Precio Fijo por {{ form.crypto }} (en {{ selectedFiatName }}):</label>
+          <label for="price" class="block text-sm font-medium text-gray-300 mb-2">Precio Fijo por {{ selectedCryptoSymbol }} (en {{ selectedFiatName }}):</label>
           <input type="number" id="price" v-model.number="form.price" placeholder="Ej: 65000" step="any"
             class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
         </div>
@@ -119,14 +107,16 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useNuxtApp, navigateTo } from '#app'
+import CryptoInput from '~/components/p2p/CryptoInput.vue'
+import FiatInput from '~/components/p2p/FiatInput.vue'
 
 const { $axios } = useNuxtApp()
 
 // --- Estado Local del Formulario ---
 const form = reactive({
   type: 'buy',
-  crypto: '',
-  fiatId: '',
+  crypto_currency_id: null,
+  fiat_currency_id: null,
   minAmount: null,
   maxAmount: null,
   priceType: 'fixed',
@@ -143,33 +133,29 @@ const validationErrors = ref([])
 const selectedPaymentId = ref(null)
 
 // --- Computed ---
-const selectedFiatName = computed(() => {
-  if (!form.fiatId) return form.fiatId || 'Fiat' // Fallback seguro
-  const coin = fiatCoins.value.find(c => c.id === form.fiatId)
-  return coin?.name || coin?.code || 'Fiat'
+const selectedCryptoSymbol = computed(() => {
+  if (!form.crypto_currency_id) return 'Cripto'
+  const coin = cryptoCoins.value.find(c => c.id === form.crypto_currency_id)
+  return coin?.symbol || coin?.name || 'Cripto'
 })
 
-// --- Utilidades ---
-const getData = (resp) => Array.isArray(resp?.data?.data) ? resp.data.data : (Array.isArray(resp?.data) ? resp.data : [])
+const selectedFiatName = computed(() => {
+  if (!form.fiat_currency_id) return 'Fiat'
+  const coin = fiatCoins.value.find(c => c.id === form.fiat_currency_id)
+  return coin?.name || coin?.code || 'Fiat'
+})
 
 // --- Carga de Datos ---
 onMounted(async () => {
   try {
-    // Cargar monedas y fiats en paralelo
+    // Cargar monedas y fiats para obtener sus nombres/símbolos
     const [fiatResp, coinResp] = await Promise.all([
-      $axios.get('/api/fiat-currencies'),
-      $axios.get('/api/currencies')
+      $axios.get('/currency'), // Endpoint del componente FiatInput
+      $axios.get('/coin')      // Endpoint del componente CryptoInput
     ])
 
-    // Configurar Fiats
-    fiatCoins.value = getData(fiatResp)
-    if (fiatCoins.value.length > 0) {
-      form.fiatId = fiatCoins.value[0].id
-    }
-
-    // Configurar Criptos (Filtrar las que no son Fiat/OffLedger)
-    const allCoins = getData(coinResp)
-    cryptoCoins.value = allCoins.filter(c => c.decimal_places !== 2 && c.offLedger !== 1 && c.network)
+    fiatCoins.value = fiatResp.data || []
+    cryptoCoins.value = coinResp.data || []
 
   } catch (e) {
     console.error('Error cargando recursos del formulario:', e)
@@ -180,9 +166,6 @@ onMounted(async () => {
 const publishAd = async () => {
   validationErrors.value = []
 
-  // Buscar ID real de la criptomoneda
-  const cryptoObj = cryptoCoins.value.find(c => [c.symbol, c.name].includes(form.crypto))
-
   const payload = {
     type: form.type,
     price: form.price,
@@ -191,8 +174,8 @@ const publishAd = async () => {
     time_limit: form.paymentWindow,
     terms: form.terms,
     price_premium: form.priceType === 'variable' ? form.pricePremium : undefined,
-    crypto_currency_id: cryptoObj?.id,
-    fiat_currency_id: form.fiatId,
+    crypto_currency_id: form.crypto_currency_id,
+    fiat_currency_id: form.fiat_currency_id,
     payment_method_id: selectedPaymentId.value
   }
 

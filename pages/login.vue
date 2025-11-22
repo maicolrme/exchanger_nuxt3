@@ -66,9 +66,6 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuth } from '~/composables/useAuth';
 
-definePageMeta({
-  layout: 'p2p'
-});
 
 const router = useRouter();
 const { login, error: authError, loading } = useAuth();

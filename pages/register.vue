@@ -95,9 +95,6 @@ import { useAuth } from '~/composables/useAuth';
 const router = useRouter();
 const { register, error: authError, loading } = useAuth();
 
-definePageMeta({
-  layout: 'p2p'
-});
 
 const name = ref('');
 const email = ref('');

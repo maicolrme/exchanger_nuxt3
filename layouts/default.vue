@@ -127,7 +127,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                 </svg>
                 <span>Notificaciones</span>
-                <span v-if="unreadCount > 0" class="ml-auto text-[10px] px-1.5 py-0.5 bg-yellow-500 text-gray-900 rounded-full font-bold leading-none">{{ unreadCount }}</span>
+                <span v-if="unreadCount > 0" class="ml-auto text-xs px-1.5 py-0.5 bg-yellow-500 text-gray-900 rounded-full font-bold">{{ unreadCount }}</span>
               </NuxtLink>
               <a href="#" @click.prevent="handleLogout" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-lg transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -215,32 +215,66 @@
           
           <!-- Menú de usuario (visible solo en desktop y cuando está autenticado) -->
           <div v-else class="hidden md:flex items-center gap-2">
-            <div class="relative group">
-              <button class="flex items-center gap-1 text-xs px-3 py-1.5 bg-gray-700 text-white rounded font-semibold hover:bg-gray-600 transition">
+            <div class="relative" ref="userMenuContainer">
+              <button @click="toggleUserMenu" class="flex items-center gap-2 text-xs px-2 py-1 bg-gray-700 text-white rounded-full font-semibold hover:bg-gray-600 transition">
+                <div class="w-7 h-7 rounded-full bg-gray-600 flex items-center justify-center text-yellow-400 font-bold">
+                  <span v-if="user?.name">{{ user.name.charAt(0).toUpperCase() }}</span>
+                  <span v-else>U</span>
+                </div>
                 <span v-if="user?.username">{{ user.username }}</span>
                 <span v-else>Usuario</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 transition-transform duration-200" :class="{'rotate-180': userMenuOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
               </button>
-              <div class="absolute right-0 mt-1 w-48 bg-gray-800 border border-gray-700 rounded shadow-lg hidden group-hover:block z-50">
-                <NuxtLink to="/profile" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Mi Perfil</NuxtLink>
-                <NuxtLink to="/wallet" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Mi Cartera</NuxtLink>
-
-
-                 <NuxtLink to="/p2p/trades" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">P2p Trades</NuxtLink>
-
-                  <NuxtLink to="/p2p/myofferts" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">P2p My Offerts </NuxtLink>
-
-
-                <NuxtLink to="/orders/history" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Historial</NuxtLink>
-                <NuxtLink to="/notifications" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
-                  Notificaciones
-                  <span v-if="unreadCount > 0" class="ml-2 text-xs px-1.5 py-0.5 bg-yellow-500 text-gray-900 rounded font-bold">{{ unreadCount }}</span>
-                </NuxtLink>
-                <div class="border-t border-gray-700 my-1"></div>
-                <a href="#" @click.prevent="handleLogout" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Cerrar Sesión</a>
-              </div>
+              
+              <transition
+                enter-active-class="transition ease-out duration-100"
+                enter-from-class="transform opacity-0 scale-95"
+                enter-to-class="transform opacity-100 scale-100"
+                leave-active-class="transition ease-in duration-75"
+                leave-from-class="transform opacity-100 scale-100"
+                leave-to-class="transform opacity-0 scale-95"
+              >
+                <div v-if="userMenuOpen" class="absolute right-0 mt-2 w-56 origin-top-right bg-gray-800 border border-gray-700 rounded-md shadow-lg z-50">
+                  <div class="px-4 py-3 border-b border-gray-700">
+                    <p class="text-sm font-semibold text-white truncate">{{ user?.name || 'Usuario' }}</p>
+                    <p class="text-xs text-gray-400 truncate">{{ user?.email || '' }}</p>
+                  </div>
+                  <div class="py-1">
+                    <NuxtLink to="/profile" class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-300 hover:bg-gray-700 hover:text-white">
+                      <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                      Mi Perfil
+                    </NuxtLink>
+                    <NuxtLink to="/wallet" class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-300 hover:bg-gray-700 hover:text-white">
+                      <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                      Mi Cartera
+                    </NuxtLink>
+                    <NuxtLink to="/p2p/myofferts" class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-300 hover:bg-gray-700 hover:text-white">
+                      <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                      Mis Ofertas P2P
+                    </NuxtLink>
+                    <NuxtLink to="/p2p/trades" class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-300 hover:bg-gray-700 hover:text-white">
+                      <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h.01M12 7h.01M16 7h.01M9 17h6a2 2 0 002-2V9a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>
+                      Mis Trades P2P
+                    </NuxtLink>
+                    <NuxtLink to="/orders/history" class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-300 hover:bg-gray-700 hover:text-white">
+                      <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                      Historial
+                    </NuxtLink>
+                    <NuxtLink to="/notifications" class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-300 hover:bg-gray-700 hover:text-white">
+                      <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                      Notificaciones
+                      <span v-if="unreadCount > 0" class="ml-auto text-xs px-1.5 py-0.5 bg-yellow-500 text-gray-900 rounded-full font-bold">{{ unreadCount }}</span>
+                    </NuxtLink>
+                  </div>
+                  <div class="border-t border-gray-700"></div>
+                  <a href="#" @click.prevent="handleLogout" class="flex items-center w-full px-4 py-2 text-sm text-left text-gray-300 hover:bg-gray-700 hover:text-white">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    Cerrar Sesión
+                  </a>
+                </div>
+              </transition>
             </div>
           </div>
           
@@ -370,90 +404,86 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue';
+import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
+import { useAuthStore } from '~/stores/auth';
+import { useNotificationsStore } from '~/stores/notifications';
 
 // --- THEME REFACTOR ---
-// Use a cookie to store the theme preference. This allows SSR to pick it up.
 const theme = useCookie('theme');
-
-// Set the theme class on the <html> element.
 useHead({
   htmlAttrs: {
-    class: () => theme.value || 'dark' // Default to 'dark' if cookie is not set
+    class: () => theme.value || 'dark'
   }
 });
-
-// The ref for the light mode state is now computed from the cookie.
 const isLightMode = computed(() => theme.value === 'light');
-
-// Function to toggle the theme updates the cookie.
 const toggleTheme = () => {
   theme.value = theme.value === 'light' ? 'dark' : 'light';
 };
 // --- END THEME REFACTOR ---
 
-
-// Obtener estado de autenticación directamente del store
 const authStore = useAuthStore();
-const user = computed(() => authStore.user);
-const isAuthenticated = computed(() => authStore.isAuthenticated);
-
-const menuOpen = ref(false);
-const selectedLanguage = ref('es');
+const notificationsStore = useNotificationsStore();
 const route = useRoute();
 
-// Función para cambiar el idioma (sin funcionalidad por ahora)
-const changeLanguage = () => {
-  localStorage.setItem('locale', selectedLanguage.value);
-  console.log('Idioma seleccionado:', selectedLanguage.value);
-};
+const menuOpen = ref(false);
+const userMenuOpen = ref(false);
+const userMenuContainer = ref(null);
+const selectedLanguage = ref('es');
 
-// Función para abrir/cerrar el menú móvil
+const user = computed(() => authStore.user);
+const isAuthenticated = computed(() => authStore.isAuthenticated);
+const unreadCount = computed(() => notificationsStore.unreadCount);
+
 const toggleMenu = () => {
   menuOpen.value = !menuOpen.value;
 };
 
-// Navegación por deslizamiento desactivada
+const toggleUserMenu = () => {
+  userMenuOpen.value = !userMenuOpen.value;
+};
 
-// Función para cerrar sesión
+const handleClickOutside = (event) => {
+  if (userMenuContainer.value && !userMenuContainer.value.contains(event.target)) {
+    userMenuOpen.value = false;
+  }
+};
+
 const handleLogout = async () => {
   await authStore.logout();
   window.location.href = '/login';
 };
 
-// Cerrar el menú cuando cambia la ruta
+const changeLanguage = () => {
+  localStorage.setItem('locale', selectedLanguage.value);
+  console.log('Idioma seleccionado:', selectedLanguage.value);
+};
+
 watch(() => route.path, () => {
   menuOpen.value = false;
+  userMenuOpen.value = false;
 });
 
-// Cargar el tema guardado y el usuario al iniciar
 onMounted(() => {
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme) {
-    isLightMode.value = savedTheme === 'light';
+  document.addEventListener('click', handleClickOutside);
+  if (process.client) {
+    const savedLocale = localStorage.getItem('locale') || 'es';
+    selectedLanguage.value = savedLocale;
+    if (authStore.token && !authStore.user) {
+      authStore.loadUser();
+    }
   }
-  
-  // Inicializar idioma desde localStorage
-  const savedLocale = localStorage.getItem('locale') || 'es';
-  selectedLanguage.value = savedLocale;
-  
-  // Cargar información del usuario solo si hay token y no hay usuario
-  if (process.client && authStore.token && !authStore.user) {
-    authStore.loadUser();
-  }
+  notificationsStore.fetchUnreadCount();
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside);
 });
 
 const { $pusher } = useNuxtApp();
-const notificationsStore = useNotificationsStore();
 
-const unreadCount = computed(() => notificationsStore.unreadCount);
-
-// Observar cambios en la autenticación para suscribirse/desuscribirse de Pusher
 watch(isAuthenticated, (newAuthStatus, oldAuthStatus) => {
   if (newAuthStatus && authStore.user?.id && $pusher) {
-    console.log(`Usuario autenticado con ID: ${authStore.user.id}. Suscribiendo a Pusher...`);
-    
     const channelName = `private-App.Models.User.${authStore.user.id}`;
     const channel = $pusher.subscribe(channelName);
 
@@ -465,25 +495,18 @@ watch(isAuthenticated, (newAuthStatus, oldAuthStatus) => {
       console.error(`Error de suscripción a Pusher en ${channelName}:`, status);
     });
 
-    // Escuchar el evento de notificación de Laravel
     channel.bind('Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', (data) => {
       console.log('Nueva notificación recibida:', data);
-      // Incrementar el contador y potencialmente añadir la notificación a la lista
-      notificationsStore.unreadCount++; 
-      // Opcional: podrías querer añadir la notificación a la lista también
-      // notificationsStore.list.unshift(notificationsStore.toUiModel(data));
+      notificationsStore.unreadCount++;
     });
 
   } else if (!newAuthStatus && oldAuthStatus) {
-    // Desuscribirse si el usuario cierra sesión
     if (authStore.user?.id && $pusher) {
         const channelName = `private-App.Models.User.${authStore.user.id}`;
-        console.log(`Cerrando sesión. Desuscribiendo del canal: ${channelName}`);
         $pusher.unsubscribe(channelName);
     }
   }
-}, { immediate: true }); // immediate: true para que se ejecute al cargar
-
+}, { immediate: true });
 </script>
 
 <style>
@@ -620,6 +643,3 @@ html.light .border-gray-700 {
   }
 }
 </style>
-// Store de notificaciones para badge
-const notifStore = useNotificationsStore();
-const unreadCount = computed(() => notifStore.unreadCount);
