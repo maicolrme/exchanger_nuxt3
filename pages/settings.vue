@@ -152,7 +152,7 @@
 </template>
 
 <script setup>
-definePageMeta({ layout: 'p2p' })
+
 
 const activeTab = ref('account')
 const formAccount = ref({ name: '', email: '', phone: '' })

@@ -143,7 +143,7 @@ useHead({
         <button @click="selectedCategory = 'favorites'"
           :class="selectedCategory === 'favorites' ? 'bg-yellow-500 text-gray-900' : 'bg-gray-800 text-gray-300'"
           class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
-          ⭐ Favoritos
+           Favoritos
         </button>
         <button @click="selectedCategory = 'spot'"
           :class="selectedCategory === 'spot' ? 'bg-yellow-500 text-gray-900' : 'bg-gray-800 text-gray-300'"
@@ -158,12 +158,12 @@ useHead({
         <button @click="selectedCategory = 'gainers'"
           :class="selectedCategory === 'gainers' ? 'bg-yellow-500 text-gray-900' : 'bg-gray-800 text-gray-300'"
           class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
-          🔥 Top Ganadores
+          Top Ganadores
         </button>
         <button @click="selectedCategory = 'losers'"
           :class="selectedCategory === 'losers' ? 'bg-yellow-500 text-gray-900' : 'bg-gray-800 text-gray-300'"
           class="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
-          📉 Top Perdedores
+          Top Perdedores
         </button>
       </div>
 
