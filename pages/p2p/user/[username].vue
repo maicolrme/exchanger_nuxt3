@@ -322,9 +322,7 @@
 
 <script setup>
 // Layout
-definePageMeta({
-  layout: 'p2p'
-})
+
 
 // Route params
 const route = useRoute()

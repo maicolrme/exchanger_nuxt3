@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 
- setPageLayout('p2p');
-
-
 // --- Estado Reactivo (antes 'data') ---
 const isDark = ref(true);
 const selectedPair = ref('BTC/USDT');

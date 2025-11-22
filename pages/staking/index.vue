@@ -115,9 +115,7 @@
 import { ref, computed } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 
-definePageMeta({
-  layout: 'p2p'
-})
+
 
 useHead({
   title: 'Staking'

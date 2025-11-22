@@ -152,7 +152,6 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '~/stores/auth'
 
-definePageMeta({ layout: 'p2p' })
 
 const auth = useAuthStore()
 const route = useRoute()

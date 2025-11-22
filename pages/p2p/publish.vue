@@ -4,105 +4,102 @@
     <div class="bg-gray-800 rounded-lg p-6 max-w-2xl mx-auto">
       <form @submit.prevent="publishAd" class="space-y-6">
 
-
-
-       
-
-
-
-        <!-- Tipo de Anuncio -->
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-2">Quiero:</label>
           <div class="flex rounded-lg bg-gray-700 p-1">
-            <button type="button" @click="p2pStore.formData.type = 'buy'" :class="{'bg-yellow-500 text-gray-900': p2pStore.formData.type === 'buy', 'text-gray-300 hover:text-white': p2pStore.formData.type !== 'buy'}" class="w-1/2 py-2 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none">
+            <button type="button" @click="form.type = 'buy'"
+              :class="{'bg-yellow-500 text-gray-900': form.type === 'buy', 'text-gray-300 hover:text-white': form.type !== 'buy'}"
+              class="w-1/2 py-2 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none">
               Comprar
             </button>
-            <button type="button" @click="p2pStore.formData.type = 'sell'" :class="{'bg-yellow-500 text-gray-900': p2pStore.formData.type === 'sell', 'text-gray-300 hover:text-white': p2pStore.formData.type !== 'sell'}" class="w-1/2 py-2 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none">
+            <button type="button" @click="form.type = 'sell'"
+              :class="{'bg-yellow-500 text-gray-900': form.type === 'sell', 'text-gray-300 hover:text-white': form.type !== 'sell'}"
+              class="w-1/2 py-2 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none">
               Vender
             </button>
           </div>
         </div>
 
-        <!-- Criptomoneda -->
         <div>
           <label for="crypto" class="block text-sm font-medium text-gray-300 mb-2">Criptomoneda:</label>
-          <select id="crypto" v-model="p2pStore.formData.crypto" class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
+          <select id="crypto" v-model="form.crypto"
+            class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
             <option disabled value="">Seleccione una criptomoneda</option>
-            <option v-for="c in p2pStore.cryptoCoins" :key="c.id" :value="c.symbol || c.name">
+            <option v-for="c in cryptoCoins" :key="c.id" :value="c.symbol || c.name">
               {{ c.name || c.symbol }}
             </option>
           </select>
         </div>
 
-        <!-- Moneda Fiat -->
         <div>
           <label for="fiat" class="block text-sm font-medium text-gray-300 mb-2">Moneda Fiat:</label>
-          <select id="fiat" v-model="p2pStore.formData.fiatId" class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
+          <select id="fiat" v-model="form.fiatId"
+            class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
             <option disabled value="">Seleccione una moneda fiat</option>
-            <option v-for="f in p2pStore.fiatCoins" :key="f.id" :value="f.id">
+            <option v-for="f in fiatCoins" :key="f.id" :value="f.id">
               {{ f.name || f.code }}
             </option>
           </select>
         </div>
 
-        <!-- Cantidad -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label for="min-amount" class="block text-sm font-medium text-gray-300 mb-2">Cantidad Mínima ({{ p2pStore.formData.crypto }}):</label>
-            <input type="number" id="min-amount" v-model.number="p2pStore.formData.minAmount" placeholder="Ej: 0.001" step="any" class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
+            <label for="min-amount" class="block text-sm font-medium text-gray-300 mb-2">Cantidad Mínima ({{ form.crypto }}):</label>
+            <input type="number" id="min-amount" v-model.number="form.minAmount" placeholder="Ej: 0.001" step="any"
+              class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
           </div>
           <div>
-            <label for="max-amount" class="block text-sm font-medium text-gray-300 mb-2">Cantidad Máxima ({{ p2pStore.formData.crypto }}):</label>
-            <input type="number" id="max-amount" v-model.number="p2pStore.formData.maxAmount" placeholder="Ej: 1.0" step="any" class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
+            <label for="max-amount" class="block text-sm font-medium text-gray-300 mb-2">Cantidad Máxima ({{ form.crypto }}):</label>
+            <input type="number" id="max-amount" v-model.number="form.maxAmount" placeholder="Ej: 1.0" step="any"
+              class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
           </div>
         </div>
 
-       
-
-        <!-- Tipo de Precio -->
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-2">Tipo de Precio:</label>
           <div class="flex rounded-lg bg-gray-700 p-1">
-            <button type="button" @click="p2pStore.formData.priceType = 'fixed'" :class="{'bg-yellow-500 text-gray-900': p2pStore.formData.priceType === 'fixed', 'text-gray-300 hover:text-white': p2pStore.formData.priceType !== 'fixed'}" class="w-1/2 py-2 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none">
+            <button type="button" @click="form.priceType = 'fixed'"
+              :class="{'bg-yellow-500 text-gray-900': form.priceType === 'fixed', 'text-gray-300 hover:text-white': form.priceType !== 'fixed'}"
+              class="w-1/2 py-2 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none">
               Precio Fijo
             </button>
-            <button type="button" @click="p2pStore.formData.priceType = 'variable'" :class="{'bg-yellow-500 text-gray-900': p2pStore.formData.priceType === 'variable', 'text-gray-300 hover:text-white': p2pStore.formData.priceType !== 'variable'}" class="w-1/2 py-2 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none">
+            <button type="button" @click="form.priceType = 'variable'"
+              :class="{'bg-yellow-500 text-gray-900': form.priceType === 'variable', 'text-gray-300 hover:text-white': form.priceType !== 'variable'}"
+              class="w-1/2 py-2 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none">
               Precio Variable
             </button>
           </div>
         </div>
 
-        <!-- Precio Fijo -->
-        <div v-if="p2pStore.formData.priceType === 'fixed'">
-          <label for="price" class="block text-sm font-medium text-gray-300 mb-2">Precio Fijo por {{ p2pStore.formData.crypto }} (en {{ selectedFiatName }}):</label>
-          <input type="number" id="price" v-model.number="p2pStore.formData.price" placeholder="Ej: 65000" step="any" class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
-        </div>
-        
-        <!-- Margen de Precio Variable -->
-        <div v-if="p2pStore.formData.priceType === 'variable'">
-          <label for="price-premium" class="block text-sm font-medium text-gray-300 mb-2">Margen de Precio (en % sobre el precio de mercado):</label>
-          <input type="number" id="price-premium" v-model.number="p2pStore.formData.pricePremium" placeholder="Ej: 1.5 (para 1.5% sobre el mercado)" step="any" class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
+        <div v-if="form.priceType === 'fixed'">
+          <label for="price" class="block text-sm font-medium text-gray-300 mb-2">Precio Fijo por {{ form.crypto }} (en {{ selectedFiatName }}):</label>
+          <input type="number" id="price" v-model.number="form.price" placeholder="Ej: 65000" step="any"
+            class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
         </div>
 
-        <!-- Tiempo Límite de Pago -->
+        <div v-if="form.priceType === 'variable'">
+          <label for="price-premium" class="block text-sm font-medium text-gray-300 mb-2">Margen de Precio (en % sobre el precio de mercado):</label>
+          <input type="number" id="price-premium" v-model.number="form.pricePremium" placeholder="Ej: 1.5 (para 1.5% sobre el mercado)" step="any"
+            class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
+        </div>
+
         <div>
           <label for="payment-window" class="block text-sm font-medium text-gray-300 mb-2">Tiempo Límite de Pago (minutos):</label>
-          <input type="number" id="payment-window" v-model.number="p2pStore.formData.paymentWindow" placeholder="Ej: 15" class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
+          <input type="number" id="payment-window" v-model.number="form.paymentWindow" placeholder="Ej: 15"
+            class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
         </div>
 
-        <!-- Métodos de Pago -->
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-2">Métodos de Pago:</label>
           <div class="grid grid-cols-2 gap-2">
-           
-             <P2pPaymentMethodInput v-model="selectedPaymentId"/>
+            <P2pPaymentMethodInput v-model="selectedPaymentId" />
           </div>
         </div>
 
-        <!-- Términos del Anuncio -->
         <div>
           <label for="terms" class="block text-sm font-medium text-gray-300 mb-2">Términos del Anuncio:</label>
-          <textarea id="terms" v-model="p2pStore.formData.terms" rows="4" placeholder="Ej: Solo usuarios verificados, pago en 15 minutos, etc." class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm"></textarea>
+          <textarea id="terms" v-model="form.terms" rows="4" placeholder="Ej: Solo usuarios verificados, pago en 15 minutos, etc."
+            class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm"></textarea>
         </div>
 
         <div v-if="validationErrors.length > 0" class="bg-red-900/50 text-red-200 p-3 rounded-lg">
@@ -120,126 +117,106 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { useP2pStore } from '~/stores/p2p'
-import { useNuxtApp } from '#app'
-
-
-// Definir el layout
-
-
-const p2pStore = useP2pStore()
-const validationErrors = ref([])
-const selectedPaymentId = ref(null);
-// Listas y estado provienen del store
-
-const selectedFiatName = computed(() => {
-  const id = p2pStore.formData.fiatId
-  if (!id) return p2pStore.formData.fiat
-  const found = p2pStore.fiatCoins.find(c => c.id === id)
-  return (found?.name || found?.code) || p2pStore.formData.fiat
-})
-
-
-
-onMounted(() => {
-  // Inicializar el tema
-  p2pStore.initTheme()
-  // Resetear el formulario
-  p2pStore.resetForm()
-  // Cargar métodos de pago desde backend
-  loadFiats()
-  loadCoins()
-})
+import { ref, reactive, onMounted, computed } from 'vue'
+import { useNuxtApp, navigateTo } from '#app'
 
 const { $axios } = useNuxtApp()
 
-const loadFiats = async () => {
+// --- Estado Local del Formulario ---
+const form = reactive({
+  type: 'buy',
+  crypto: '',
+  fiatId: '',
+  minAmount: null,
+  maxAmount: null,
+  priceType: 'fixed',
+  price: null,
+  pricePremium: null,
+  paymentWindow: null,
+  terms: ''
+})
+
+// --- Estado de UI y Listas ---
+const cryptoCoins = ref([])
+const fiatCoins = ref([])
+const validationErrors = ref([])
+const selectedPaymentId = ref(null)
+
+// --- Computed ---
+const selectedFiatName = computed(() => {
+  if (!form.fiatId) return form.fiatId || 'Fiat' // Fallback seguro
+  const coin = fiatCoins.value.find(c => c.id === form.fiatId)
+  return coin?.name || coin?.code || 'Fiat'
+})
+
+// --- Utilidades ---
+const getData = (resp) => Array.isArray(resp?.data?.data) ? resp.data.data : (Array.isArray(resp?.data) ? resp.data : [])
+
+// --- Carga de Datos ---
+onMounted(async () => {
   try {
-    const resp = await $axios.get('/currency')
-    const list = Array.isArray(resp?.data?.data) ? resp.data.data : (Array.isArray(resp?.data) ? resp.data : [])
-    p2pStore.fiatCoins = list
-    if (!p2pStore.formData.fiatId && list.length > 0) {
-      p2pStore.formData.fiatId = list[0].id
+    // Cargar monedas y fiats en paralelo
+    const [fiatResp, coinResp] = await Promise.all([
+      $axios.get('/api/fiat-currencies'),
+      $axios.get('/api/currencies')
+    ])
+
+    // Configurar Fiats
+    fiatCoins.value = getData(fiatResp)
+    if (fiatCoins.value.length > 0) {
+      form.fiatId = fiatCoins.value[0].id
     }
+
+    // Configurar Criptos (Filtrar las que no son Fiat/OffLedger)
+    const allCoins = getData(coinResp)
+    cryptoCoins.value = allCoins.filter(c => c.decimal_places !== 2 && c.offLedger !== 1 && c.network)
+
   } catch (e) {
-    console.error('No se pudo cargar /currency', e)
+    console.error('Error cargando recursos del formulario:', e)
   }
-}
+})
 
-const loadCoins = async () => {
-  try {
-    const resp = await $axios.get('/coin')
-    const list = Array.isArray(resp?.data?.data) ? resp.data.data : (Array.isArray(resp?.data) ? resp.data : [])
-
-    const isFiat = (c) => (c.decimal_places === 2 || c.offLedger === 1 || !c.network)
-    const fiats = list.filter(isFiat)
-    const cryptos = list.filter(c => !isFiat(c))
-
-    p2pStore.cryptoCoins = cryptos
-
-    // No tocar fiatCoins aquí; se cargan desde /currency
-  } catch (e) {
-    console.error('No se pudo cargar /coin', e)
-  }
-}
-
-const resolveCryptoId = () => {
-  const sel = p2pStore.formData.crypto
-  const found = p2pStore.cryptoCoins.find(c => c.symbol === sel || c.name === sel)
-  return found?.id ?? null
-}
-
+// --- Envío del Formulario ---
 const publishAd = async () => {
-  // Limpiar errores previos, delegar validación al backend (Laravel)
   validationErrors.value = []
 
+  // Buscar ID real de la criptomoneda
+  const cryptoObj = cryptoCoins.value.find(c => [c.symbol, c.name].includes(form.crypto))
+
   const payload = {
-    type: p2pStore.formData.type,
-    price: p2pStore.formData.price,
-    min_amount: p2pStore.formData.minAmount,
-    max_amount: p2pStore.formData.maxAmount,
-    time_limit: p2pStore.formData.paymentWindow,
-    terms: p2pStore.formData.terms,
-    // precio variable opcional
-    price_premium: p2pStore.formData.priceType === 'variable' ? p2pStore.formData.pricePremium : undefined,
-    // IDs requeridos por backend
-    currency_id: resolveCryptoId(),
-    fiat_currency_id: p2pStore.formData.fiatId,
+    type: form.type,
+    price: form.price,
+    min_amount: form.minAmount,
+    max_amount: form.maxAmount,
+    time_limit: form.paymentWindow,
+    terms: form.terms,
+    price_premium: form.priceType === 'variable' ? form.pricePremium : undefined,
+    crypto_currency_id: cryptoObj?.id,
+    fiat_currency_id: form.fiatId,
     payment_method_id: selectedPaymentId.value
   }
 
   try {
-    const resp = await $axios.post('/p2p/offers', payload)
-    const created = resp?.data?.data || resp?.data
-    if (created) {
+    const { data } = await $axios.post('/p2p/offers', payload)
+    
+    if (data?.data || data) {
       alert('Anuncio publicado con éxito!')
-      // Resetear el formulario
-      p2pStore.resetForm()
-      selectedPaymentId.value = null
-      // Redirigir a la página de P2P
       navigateTo('/p2p/myofferts')
     } else {
-      alert('Respuesta inesperada del servidor')
+      validationErrors.value = ['Respuesta inesperada del servidor']
     }
   } catch (e) {
-    const data = e?.response?.data
-    const msgs = []
-    if (data?.errors && typeof data.errors === 'object') {
-      for (const k of Object.keys(data.errors)) {
-        const arr = Array.isArray(data.errors[k]) ? data.errors[k] : [String(data.errors[k])]
-        msgs.push(...arr)
-      }
-    } else if (data?.message) {
-      msgs.push(data.message)
+    const errData = e?.response?.data
+    if (errData?.errors) {
+      // Aplana los errores de Laravel {campo: [error1, error2]} a un array simple
+      validationErrors.value = Object.values(errData.errors).flat()
     } else {
-      msgs.push('No se pudo publicar el anuncio')
+      validationErrors.value = [errData?.message || 'No se pudo publicar el anuncio']
     }
-    validationErrors.value = msgs
   }
 }
 </script>
 
 <style scoped>
-/* Estilos específicos para esta página si son necesarios */
+/* Estilos locales */
 </style>

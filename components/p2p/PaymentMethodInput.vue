@@ -1,17 +1,19 @@
 <template>
   <div>
-    <div class="relative flex items-stretch w-full">
-      <input
-        type="text"
-        class="flex-grow w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-sm text-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 cursor-pointer"
-        :value="selectedPaymentMethodName"
+    <div class="relative w-full">
+      <button
+        type="button"
+        class="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-sm text-left flex items-center"
         @click="openModal"
-        readonly
-        placeholder="Selecciona un método de pago"
-      />
+      >
+        <span v-if="selectedPaymentMethodName" class="text-white">{{ selectedPaymentMethodName }}</span>
+        <span v-else class="text-gray-400">Selecciona un método de pago</span>
+      </button>
       <div v-if="modelValue" class="absolute inset-y-0 right-0 flex items-center pr-3">
-        <button class="text-gray-400 hover:text-white" type="button" @click.stop="clearPaymentMethod">
-          &times;
+        <button @click.stop="clearPaymentMethod" type="button" class="text-gray-400 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
       </div>
     </div>

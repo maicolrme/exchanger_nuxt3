@@ -10,7 +10,7 @@
         <div class="p-4 border-b border-gray-700 flex items-center justify-between">
           <h1 class="text-xl font-bold text-yellow-400">CryptoEx</h1>
           <button @click="toggleMenu" class="text-gray-400 hover:text-white">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
@@ -217,7 +217,7 @@
           <div v-else class="hidden md:flex items-center gap-2">
             <div class="relative group">
               <button class="flex items-center gap-1 text-xs px-3 py-1.5 bg-gray-700 text-white rounded font-semibold hover:bg-gray-600 transition">
-                <span v-if="user?.name">{{ user.name }}</span>
+                <span v-if="user?.username">{{ user.username }}</span>
                 <span v-else>Usuario</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -269,7 +269,7 @@
           
           <!-- Icono de Notificaciones (solo en desktop y si está autenticado) -->
           <NuxtLink v-if="isAuthenticated" to="/notifications" aria-label="Notificaciones" class="hidden md:block relative text-gray-400 hover:text-white transition-colors duration-300">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg class="w-6 h-6" :class="{ 'text-red-500': unreadCount > 0, 'text-gray-400': unreadCount === 0 }" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
             </svg>
             <span v-if="unreadCount > 0" class="absolute -top-1 -right-1 text-[10px] px-1.5 py-0.5 bg-yellow-500 text-gray-900 rounded-full font-bold leading-none">{{ unreadCount }}</span>
@@ -373,22 +373,35 @@
 import { ref, onMounted, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 
+// --- THEME REFACTOR ---
+// Use a cookie to store the theme preference. This allows SSR to pick it up.
+const theme = useCookie('theme');
+
+// Set the theme class on the <html> element.
+useHead({
+  htmlAttrs: {
+    class: () => theme.value || 'dark' // Default to 'dark' if cookie is not set
+  }
+});
+
+// The ref for the light mode state is now computed from the cookie.
+const isLightMode = computed(() => theme.value === 'light');
+
+// Function to toggle the theme updates the cookie.
+const toggleTheme = () => {
+  theme.value = theme.value === 'light' ? 'dark' : 'light';
+};
+// --- END THEME REFACTOR ---
+
+
 // Obtener estado de autenticación directamente del store
 const authStore = useAuthStore();
 const user = computed(() => authStore.user);
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 
-// Estado para el tema
-const isLightMode = ref(false);
 const menuOpen = ref(false);
 const selectedLanguage = ref('es');
 const route = useRoute();
-
-// Función para cambiar el tema
-const toggleTheme = () => {
-  isLightMode.value = !isLightMode.value;
-  localStorage.setItem('theme', isLightMode.value ? 'light' : 'dark');
-};
 
 // Función para cambiar el idioma (sin funcionalidad por ahora)
 const changeLanguage = () => {
@@ -430,6 +443,47 @@ onMounted(() => {
     authStore.loadUser();
   }
 });
+
+const { $pusher } = useNuxtApp();
+const notificationsStore = useNotificationsStore();
+
+const unreadCount = computed(() => notificationsStore.unreadCount);
+
+// Observar cambios en la autenticación para suscribirse/desuscribirse de Pusher
+watch(isAuthenticated, (newAuthStatus, oldAuthStatus) => {
+  if (newAuthStatus && authStore.user?.id && $pusher) {
+    console.log(`Usuario autenticado con ID: ${authStore.user.id}. Suscribiendo a Pusher...`);
+    
+    const channelName = `private-App.Models.User.${authStore.user.id}`;
+    const channel = $pusher.subscribe(channelName);
+
+    channel.bind('pusher:subscription_succeeded', () => {
+      console.log(`Suscripción exitosa al canal: ${channelName}`);
+    });
+
+    channel.bind('pusher:subscription_error', (status) => {
+      console.error(`Error de suscripción a Pusher en ${channelName}:`, status);
+    });
+
+    // Escuchar el evento de notificación de Laravel
+    channel.bind('Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', (data) => {
+      console.log('Nueva notificación recibida:', data);
+      // Incrementar el contador y potencialmente añadir la notificación a la lista
+      notificationsStore.unreadCount++; 
+      // Opcional: podrías querer añadir la notificación a la lista también
+      // notificationsStore.list.unshift(notificationsStore.toUiModel(data));
+    });
+
+  } else if (!newAuthStatus && oldAuthStatus) {
+    // Desuscribirse si el usuario cierra sesión
+    if (authStore.user?.id && $pusher) {
+        const channelName = `private-App.Models.User.${authStore.user.id}`;
+        console.log(`Cerrando sesión. Desuscribiendo del canal: ${channelName}`);
+        $pusher.unsubscribe(channelName);
+    }
+  }
+}, { immediate: true }); // immediate: true para que se ejecute al cargar
+
 </script>
 
 <style>
@@ -457,44 +511,47 @@ body {
   padding: 0px 0;
 }
 
-/* Estilos para el modo claro/oscuro */
-.light-mode {
+/* --- THEME REFACTOR --- */
+/* The .light-mode class is now on the <html> tag, so selectors are updated */
+html.light .app-layout {
   background-color: #f5f5f5;
   color: #1a1a1a;
 }
 
-.light-mode .bg-gray-900 {
+html.light .bg-gray-900 {
   background-color: #f5f5f5 !important;
 }
 
-.light-mode .bg-gray-800 {
+html.light .bg-gray-800 {
   background-color: #ffffff !important;
   border: 1px solid #e5e5e5;
 }
 
-.light-mode .bg-gray-700 {
+html.light .bg-gray-700 {
   background-color: #f8f8f8 !important;
 }
 
-.light-mode .bg-gray-750 {
+html.light .bg-gray-750 {
   background-color: #f0f0f0 !important;
 }
 
-.light-mode .text-white {
+html.light .text-white {
   color: #1a1a1a !important;
 }
 
-.light-mode .text-gray-300 {
+html.light .text-gray-300 {
   color: #666666 !important;
 }
 
-.light-mode .text-gray-400 {
+html.light .text-gray-400 {
   color: #999999 !important;
 }
 
-.light-mode .border-gray-700 {
+html.light .border-gray-700 {
   border-color: #e5e5e5 !important;
 }
+/* --- END THEME REFACTOR --- */
+
 
 /* Estilos adicionales */
 .price-up {

@@ -279,9 +279,7 @@ const notificationMessage = ref('');
 const currentSlide = ref(0);
 
 
-definePageMeta({
-  layout: 'p2p'
-});
+
 
 const slides = [
   {

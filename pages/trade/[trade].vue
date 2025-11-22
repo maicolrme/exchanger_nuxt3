@@ -1,15 +1,24 @@
 <template>
   
 
-  <DeviceView name="trade" :market="route.params.market" />
+  <DeviceView name="trade" :market="formattedMarket" />
    
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 // 1. Asignar el layout 'simple' (sin navbar) a esta página
 
 const route = useRoute();
-const market = route.params.market; // Esto te dará 'btc-usdt' si la URL es /trade/btc-usdt
+const marketFromRoute = computed(() => route.params.trade);
+
+const formattedMarket = computed(() => {
+  const market = marketFromRoute.value;
+  if (typeof market === 'string') {
+    return market.replace(/_/g, '/');
+  }
+  return market;
+});
 
 </script>
 

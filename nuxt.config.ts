@@ -32,7 +32,7 @@ export default defineNuxtConfig({
   // Registrar plugins
   plugins: [
     '~/plugins/axios.js',
-    '~/plugins/pusher.js'
+    '~/plugins/pusher.client.js'
   ],
   // Configuración de rutas
   router: {
@@ -60,8 +60,11 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBase: 'https://exchanger.test/api',
-      pusherAppKey: '8b7a912a1b66ce5ad679',
-      pusherCluster: 'mt1'
+      apiUrl: 'https://exchanger.test/api',
+      pusher: {
+        key: 'fbd283439499f54faa27',
+        cluster: 'mt1'
+      }
     }
   }
 })
