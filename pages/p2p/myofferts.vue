@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useMyOffers } from '~/composables/useMyOffers'
+import SkeletonLoader from '~/components/p2p/SkeletonLoader.vue'
 
 // --- State ---
 const isLightMode = ref(false)
@@ -118,7 +119,21 @@ useHead({
         </div>
 
         <div class="md:hidden space-y-4">
-          <div v-for="ad in filteredAds" :key="ad.id" class="bg-gray-800 rounded-lg p-4 border-l-4 shadow-sm" :class="ad.type === 'buy' ? 'border-green-500' : 'border-red-500'">
+          <!-- Mobile Loading -->
+          <div v-if="loading" class="py-8">
+            <SkeletonLoader />
+          </div>
+          <!-- Mobile Error -->
+          <div v-else-if="error" class="text-center py-12 px-6 bg-red-900/30 rounded-lg">
+            <p class="text-xl font-bold text-red-400">¡Error!</p>
+            <p class="mt-2 text-red-300">No se pudieron cargar tus ofertas.</p>
+          </div>
+          <!-- Mobile No Data -->
+          <div v-else-if="filteredAds.length === 0" class="text-center py-12">
+            <p class="text-xl font-semibold text-gray-500">No tienes anuncios aquí.</p>
+          </div>
+
+          <div v-else v-for="ad in filteredAds" :key="ad.id" class="bg-gray-800 rounded-lg p-4 border-l-4 shadow-sm" :class="ad.type === 'buy' ? 'border-green-500' : 'border-red-500'">
             <div class="flex justify-between items-start mb-3">
               <div>
                 <span class="text-xs font-bold uppercase tracking-wider" :class="ad.type === 'buy' ? 'text-green-500' : 'text-red-500'">
@@ -171,7 +186,27 @@ useHead({
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-700">
-              <tr v-for="ad in filteredAds" :key="ad.id" class="hover:bg-gray-750 transition-colors">
+              <!-- Loading State -->
+              <tr v-if="loading">
+                <td colspan="7" class="text-center">
+                  <SkeletonLoader />
+                </td>
+              </tr>
+              <!-- Error State -->
+              <tr v-else-if="error">
+                <td colspan="7" class="text-center py-12 px-6 bg-red-900/30">
+                  <p class="text-xl font-bold text-red-400">¡Error!</p>
+                  <p class="mt-2 text-red-300">No se pudieron cargar tus ofertas.</p>
+                </td>
+              </tr>
+              <!-- No Data State -->
+              <tr v-else-if="filteredAds.length === 0">
+                <td colspan="7" class="text-center py-12">
+                  <p class="text-xl font-semibold text-gray-500">No tienes anuncios aquí.</p>
+                </td>
+              </tr>
+
+              <tr v-else v-for="ad in filteredAds" :key="ad.id" class="hover:bg-gray-750 transition-colors">
                 <td class="px-6 py-4">
                   <div class="font-mono text-xs text-gray-500 mb-1">#{{ ad.id }}</div>
                   <span :class="ad.type === 'buy' ? 'text-green-500' : 'text-red-500'" class="font-bold">

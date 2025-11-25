@@ -11,6 +11,14 @@
     "account": "Mi Cuenta",
     "history": "Historial"
   },
+  "navigation": {
+    "general": [
+      { "name": "Home", "href": "/" },
+      { "name": "Markets", "href": "/markets" },
+      { "name": "P2P", "href": "/p2p" },
+      { "name": "Staking", "href": "/staking" }
+    ]
+  },
   "btn": {
     "publish": "Publicar Anuncio",
     "buy": "Comprar",

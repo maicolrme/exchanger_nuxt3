@@ -22,7 +22,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   // Interceptor para agregar el token de autenticación a todas las solicitudes
   axiosInstance.interceptors.request.use(config => {
     // Obtener token desde el store de Pinia
-    const authStore = useAuthStore();
+    const authStore = useAuthStore(nuxtApp.$pinia);
     const token = authStore.token;
     
     if (token) {
@@ -38,12 +38,12 @@ export default defineNuxtPlugin((nuxtApp) => {
       // Si el error es 401 (no autorizado), limpiar autenticación y redirigir al login
       if (error.response && error.response.status === 401) {
         // Limpiar autenticación usando el store de Pinia
-        const authStore = useAuthStore();
+        const authStore = useAuthStore(nuxtApp.$pinia);
         authStore.clearAuth();
         
-        // Redirigir a login
+        // Redirigir a login usando el router de Nuxt
         if (process.client) {
-          window.location.href = '/login';
+          nuxtApp.$router.push('/login');
         }
       }
       return Promise.reject(error);

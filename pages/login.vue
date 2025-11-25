@@ -87,7 +87,7 @@ async function handleLogin() {
   
   if (success) {
     // Forzar recarga para actualizar el estado de autenticación en la UI
-    window.location.href = '/';
+    router.push('/');
   } else {
     error.value = authError.value;
   }

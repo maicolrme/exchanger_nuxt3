@@ -32,19 +32,22 @@ export default defineNuxtConfig({
   // Registrar plugins
   plugins: [
     '~/plugins/axios.js',
-    '~/plugins/pusher.client.js'
+    '~/plugins/pusher.client.js',
+      '~/plugins/auth-init',
+     
+
   ],
   // Configuración de rutas
   router: {
-    middleware: ['auth']
+   // middleware: ['auth']
   },
   // Configuración de módulos
   modules: [
     '@nuxtjs/tailwindcss', 
     '@pinia/nuxt', 
-    'pinia-plugin-persistedstate/nuxt'
-    
   ],
+ 
+ 
 
   
   

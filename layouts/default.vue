@@ -221,7 +221,7 @@
                   <span v-if="user?.name">{{ user.name.charAt(0).toUpperCase() }}</span>
                   <span v-else>U</span>
                 </div>
-                <span v-if="user?.username">{{ user.username }}</span>
+                <span v-if="user?.name">{{ user.name }}</span>
                 <span v-else>Usuario</span>
                 <svg class="w-4 h-4 transition-transform duration-200" :class="{'rotate-180': userMenuOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -400,6 +400,7 @@
         </div>
       </div>
     </footer>
+    <ToastNotifications />
   </div>
 </template>
 
@@ -408,6 +409,7 @@ import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from '~/stores/auth';
 import { useNotificationsStore } from '~/stores/notifications';
+import ToastNotifications from '~/components/ToastNotifications.vue';
 
 // --- THEME REFACTOR ---
 const theme = useCookie('theme');
@@ -451,7 +453,8 @@ const handleClickOutside = (event) => {
 
 const handleLogout = async () => {
   await authStore.logout();
-  window.location.href = '/login';
+  const router = useRouter();
+  router.push('/login');
 };
 
 const changeLanguage = () => {
@@ -472,8 +475,10 @@ onMounted(() => {
     if (authStore.token && !authStore.user) {
       authStore.loadUser();
     }
+    if (isAuthenticated.value && authStore.user) {
+      notificationsStore.fetchUnreadCount();
+    }
   }
-  notificationsStore.fetchUnreadCount();
 });
 
 onBeforeUnmount(() => {
@@ -485,7 +490,7 @@ const { $pusher } = useNuxtApp();
 watch(isAuthenticated, (newAuthStatus, oldAuthStatus) => {
   if (newAuthStatus && authStore.user?.id && $pusher) {
     const channelName = `private-App.Models.User.${authStore.user.id}`;
-    const channel = $pusher.subscribe(channelName);
+    const channel = $pusher.instance.subscribe(channelName);
 
     channel.bind('pusher:subscription_succeeded', () => {
       console.log(`Suscripción exitosa al canal: ${channelName}`);

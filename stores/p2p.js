@@ -27,7 +27,16 @@ export const useP2pStore = defineStore('p2p', {
       paymentWindow: 15,
       priceType: 'fixed',
       pricePremium: null
-    }
+    },
+    // Estado del chat
+    chatMessages: [],
+    chatLoading: false,
+    chatError: null,
+
+    // Estado del trade actual
+    currentTrade: null,
+    tradeLoading: false,
+    tradeError: null
   }),
   
   actions: {
@@ -175,6 +184,78 @@ export const useP2pStore = defineStore('p2p', {
       } finally {
         this.fiatLoading = false
       }
+    },
+
+    async fetchTrade(tradeId) {
+      const { $axios } = useNuxtApp()
+      this.tradeLoading = true
+      this.tradeError = null
+      try {
+        const response = await $axios.get(`/p2p/trades/${tradeId}`)
+        this.currentTrade = response.data.data // Ajustado al formato de respuesta
+        return this.currentTrade
+      } catch (e) {
+        console.error(`Error cargando el trade ${tradeId}:`, e)
+        this.tradeError = e?.response?.data?.message || 'Error al cargar el trade'
+        throw e
+      } finally {
+        this.tradeLoading = false
+      }
+    },
+
+    async fetchChatMessages(tradeId) {
+      const { $axios } = useNuxtApp()
+      this.chatLoading = true
+      this.chatError = null
+      try {
+        const response = await $axios.get(`/p2p/trades/${tradeId}/messages`)
+        this.chatMessages = response.data.data.map(msg => ({
+          id: msg.id,
+          senderId: msg.sender_id,
+          senderName: msg.sender,
+          text: msg.text,
+          time: msg.time,
+          attachments: msg.attachments || []
+        }))
+        return this.chatMessages
+      } catch (error) {
+        console.error('Error fetching chat messages:', error)
+        this.chatError = error?.response?.data?.message || 'Error al cargar mensajes'
+        throw error
+      } finally {
+        this.chatLoading = false
+      }
+    },
+
+    async sendChatMessage(tradeId, message, files) {
+      const { $axios } = useNuxtApp()
+      const formData = new FormData()
+      formData.append('message', message)
+      files.forEach(file => {
+        formData.append('attachments[]', file)
+      })
+
+      try {
+        const response = await $axios.post(`/p2p/trades/${tradeId}/messages`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        // Opcional: agregar el mensaje enviado a la lista para actualización optimista
+        // El evento de pusher ya debería manejar esto.
+        return response.data
+      } catch (error) {
+        console.error('Error sending chat message:', error)
+        throw error
+      }
+    },
+
+    addChatMessage(message) {
+      this.chatMessages.push(message)
+    },
+
+    clearChatMessages() {
+      this.chatMessages = []
     }
   }
 })

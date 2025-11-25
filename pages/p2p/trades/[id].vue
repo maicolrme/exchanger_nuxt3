@@ -5,22 +5,26 @@ const route = useRoute()
 const router = useRouter()
 const tradeApi = useTradeApi()
 import { useAuthStore } from '~/stores/auth';
+import { useP2pStore } from '~/stores/p2p';
+import ChatBox from '@/components/p2p/ChatBox.vue';
 
 // ID del trade desde la URL
 const tradeId = computed(() => route.params.id)
+const p2pStore = useP2pStore()
+const authStore = useAuthStore()
 
 // Estado de carga y error
-const loading = ref(true)
-const error = ref(null)
+const loading = computed(() => p2pStore.tradeLoading)
+const error = computed(() => p2pStore.tradeError)
 
 // Datos del trade desde la API
-const trade = ref(null)
-const userRole = ref(null)
-const isBuyer = ref(false)
-const isSeller = ref(false)
-const permissions = ref(null)
-const counterparty = ref(null)
-const timeRemaining = ref(null)
+const trade = computed(() => p2pStore.currentTrade?.trade)
+const userRole = computed(() => p2pStore.currentTrade?.user_role)
+const isBuyer = computed(() => p2pStore.currentTrade?.is_buyer)
+const isSeller = computed(() => p2pStore.currentTrade?.is_seller)
+const permissions = computed(() => p2pStore.currentTrade?.permissions)
+const counterparty = computed(() => p2pStore.currentTrade?.counterparty)
+const timeRemaining = computed(() => p2pStore.currentTrade?.time_remaining)
 
 // Estado del componente
 const isLightMode = ref(false)
@@ -40,9 +44,11 @@ const paymentInfo = ref({
 })
 
 // Mensajes de chat
-const chatMessages = ref([])
+const chatMessages = computed(() => p2pStore.chatMessages)
 
 // --- Computed Properties ---
+const currentUserId = computed(() => authStore.user?.id)
+
 const tradeTitle = computed(() => {
   if (!trade.value) return ''
   const action = isBuyer.value ? 'Comprar' : 'Vender'
@@ -108,74 +114,30 @@ const actionMessage = computed(() => {
 })
 
 // --- Métodos ---
+const isMyMessage = (message) => {
+  return message.sender_id === currentUserId.value
+}
+
 const fetchTradeData = async () => {
   try {
-    loading.value = true
-    error.value = null
-    
-    // Llamada a la API usando el composable
-    const response = await tradeApi.getTrade(tradeId.value)
-    
-    // Asignar datos de la respuesta
-    trade.value = response.trade
-    userRole.value = response.user_role
-    isBuyer.value = response.is_buyer
-    isSeller.value = response.is_seller
-    permissions.value = response.permissions
-    counterparty.value = response.counterparty
-    timeRemaining.value = response.time_remaining
-    
+    await p2pStore.fetchTrade(tradeId.value)
+    await p2pStore.fetchChatMessages(tradeId.value)
+
     // Inicializar concepto de pago
     if (trade.value?.trade_number) {
       paymentInfo.value.concepto = `Trade ${trade.value.trade_number}`
     }
     
-    // Inicializar mensajes de chat
-    initializeChatMessages()
-    
-    // Cargar mensajes del chat si existen
-    if (trade.value?.messages && trade.value.messages.length > 0) {
-      chatMessages.value = trade.value.messages.map(msg => ({
-        id: msg.id,
-        sender: msg.user_id === trade.value?.buyer_id 
-          ? (isBuyer.value ? 'me' : 'buyer')
-          : (isSeller.value ? 'me' : 'seller'),
-        text: msg.message,
-        attachments: msg.attachments || [],
-        time: new Date(msg.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
-      }))
-    }
-    
     // Iniciar timer si es necesario
-    if (trade.value?.expires_at && !timeRemaining.value?.expired) {
-      startTimer(trade.value.expires_at)
+    if (p2pStore.currentTrade?.trade?.expires_at && !timeRemaining.value?.expired) {
+      startTimer(p2pStore.currentTrade.trade.expires_at)
     }
     
     scrollToBottom()
     
   } catch (err) {
     console.error('Error al cargar el trade:', err)
-    error.value = err.response?.data?.message || err.message || 'Error al cargar los datos del trade'
-  } finally {
-    loading.value = false
   }
-}
-
-const initializeChatMessages = () => {
-  if (!trade.value || chatMessages.value.length > 0) return
-  
-  const initialMessage = isBuyer.value
-    ? 'Hola, puedes proceder con el pago. Liberaré los fondos tan pronto como lo reciba.'
-    : '¡Hola! Listo para realizar el pago.'
-  
-  chatMessages.value = [
-    { 
-      id: 1, 
-      sender: isBuyer.value ? 'seller' : 'buyer', 
-      text: initialMessage,
-      time: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
-    }
-  ]
 }
 
 const toggleTheme = () => {
@@ -237,30 +199,16 @@ const sendMessage = async () => {
     newMessage.value = ''
     chatFiles.value = []
     
-    // Agregar mensaje optimistamente a la UI
-    const tempMessage = {
-      id: Date.now(),
-      sender: 'me',
-      text: messageText,
-      attachments: attachments.map(file => ({ name: file.name, url: URL.createObjectURL(file) })),
-      time: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
-    }
-  //  chatMessages.value.push(tempMessage)
-    
     // Scroll al final
     scrollToBottom()
     
-    // Enviar mensaje al servidor
-    await tradeApi.sendMessage(tradeId.value, messageText, attachments)
-    
-    // Recargar datos para obtener el mensaje real con la URL del servidor
-    // await fetchTradeData() // Eliminado para evitar recarga
+    // Enviar mensaje al servidor a través del store
+    await p2pStore.sendChatMessage(tradeId.value, messageText, attachments)
     
   } catch (err) {
     console.error('Error al enviar mensaje:', err)
     alert('Error al enviar el mensaje')
-    // Recargar mensajes para revertir el estado optimista si falla
-    // await fetchTradeData() // Eliminado para evitar recarga
+    alert('Error al enviar el mensaje')
   }
 }
 
@@ -427,7 +375,7 @@ onMounted(() => {
   fetchTradeData().then(() => {
     if (process.client && $pusher && tradeId.value) {
       console.log(`Intentando suscribirse al canal: private-p2p.${tradeId.value}`);
-      p2pChannel = $pusher.subscribe(`private-p2p.${tradeId.value}`);
+      p2pChannel = $pusher.instance.subscribe(`private-p2p.${tradeId.value}`);
 
       p2pChannel.bind('pusher:subscription_succeeded', () => {
         console.log('Suscripción a Pusher exitosa!');
@@ -440,14 +388,13 @@ onMounted(() => {
       p2pChannel.bind('message.sent', (data) => {
         const newMessage = {
           id: data.message_id,
-          sender: data.user.id === trade.value?.buyer_id
-            ? (isBuyer.value ? 'me' : 'buyer')
-            : (isSeller.value ? 'me' : 'seller'),
-          text: data.message, // Corregido de data.body a data.message
-          attachments: data.attachments || [],
-          time: new Date(data.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+          senderId: data.user.id,
+          senderName: data.user.name,
+          text: data.message,
+          time: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+          attachments: data.attachments || []
         };
-        chatMessages.value.push(newMessage);
+        p2pStore.addChatMessage(newMessage);
         scrollToBottom();
       });
 
@@ -504,12 +451,12 @@ onBeforeUnmount(() => {
   // Desuscripción de Pusher
   if (p2pChannel) {
     p2pChannel.unbind_all()
-    $pusher.unsubscribe(`private-p2p.${tradeId.value}`)
+    $pusher.instance.unsubscribe(`private-p2p.${tradeId.value}`)
+    p2pStore.clearChatMessages()
   }
 })
 
 </script>
-
 <template>
   <div 
     class="min-h-screen transition-colors duration-300 bg-gray-900 text-white font-sans" 
@@ -765,27 +712,33 @@ onBeforeUnmount(() => {
           
           <!-- Mensajes del Chat -->
           <div ref="chatboxRef" class="flex-1 p-4 space-y-4 overflow-y-auto styled-scrollbar">
-            <div 
-              v-for="message in chatMessages" 
-              :key="message.id" 
-              class="flex" 
-              :class="message.sender === 'me' ? 'justify-end' : 'justify-start'"
+            <div
+              v-for="message in chatMessages"
+              :key="message.id"
+              class="flex items-start gap-2.5"
+              :class="isMyMessage(message) ? 'justify-end' : 'justify-start'"
             >
-              <div 
-                class="max-w-xs md:max-w-md p-3 rounded-lg" 
-                :class="message.sender === 'me' ? 'chat-bubble-sent rounded-br-none' : 'chat-bubble-received rounded-bl-none'"
+              <div
+                class="flex flex-col w-full max-w-[320px] leading-1.5 p-4 border-gray-200"
+                :class="
+                  isMyMessage(message)
+                    ? 'bg-blue-100 rounded-l-xl rounded-br-xl'
+                    : 'bg-gray-100 rounded-e-xl rounded-es-xl'
+                "
               >
-                <p v-if="message.text" class="text-sm">{{ message.text }}</p>
-                
-                <!-- Mostrar archivos adjuntos -->
+                <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                  <span class="text-sm font-semibold text-gray-900">{{ message.senderName }}</span>
+                  <span class="text-sm font-normal text-gray-500">{{ message.time }}</span>
+                </div>
+                <p class="text-sm font-normal py-2.5 text-gray-900">{{ message.text }}</p>
                 <div v-if="message.attachments && message.attachments.length > 0" class="mt-2 space-y-2">
-                  <a 
-                    v-for="(attachment, index) in message.attachments"
-                    :key="index"
-                    :href="attachment.url" 
-                    target="_blank" 
+                  <a
+                    v-for="attachment in message.attachments"
+                    :key="attachment.id"
+                    :href="attachment.url"
+                    target="_blank"
                     class="flex items-center gap-2 text-sm font-semibold hover:underline"
-                    :class="message.sender === 'me' ? 'text-gray-800' : 'text-blue-300'"
+                    :class="isMyMessage(message) ? 'text-gray-800' : 'text-blue-300'"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
                     <span>{{ attachment.name }}</span>
@@ -839,6 +792,12 @@ onBeforeUnmount(() => {
               </button>
             </form>
           </div>
+        </div>
+        <div class="w-full lg:w-1/3 xl:w-1/4">
+          const handleMessageSent = () => {
+            // Lógica para manejar el evento messageSent, si es necesario
+            console.log('Message sent from ChatBox!');
+          };
         </div>
       </div>
     </div>

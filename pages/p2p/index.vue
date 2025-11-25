@@ -245,6 +245,9 @@ import { useNuxtApp } from '#app';
 import P2pPaymentMethodInput from '~/components/p2p/PaymentMethodInput.vue';
 import CryptoInput from '~/components/p2p/CryptoInput.vue';
 import FiatInput from '~/components/p2p/FiatInput.vue';
+import { useNotificationsStore } from '~/stores/notifications';
+
+const notificationsStore = useNotificationsStore();
 
 // Definir el layout para esta página usando la sintaxis correcta de Nuxt 3
 
@@ -358,9 +361,42 @@ const viewDetails = (offer) => {
 };
 
 // Confirmar la operación
-const confirmTrade = () => {
-  // Aquí iría la lógica para confirmar la operación
-  alert(`Operación de ${tradeMode.value === 'buy' ? 'compra' : 'venta'} iniciada`);
-  selectedOffer.value = null;
+const confirmTrade = async () => {
+  if (!selectedOffer.value || !tradeAmount.value) {
+    notificationsStore.addNotification({
+      type: 'error',
+      message: 'Por favor, introduce un monto para continuar.',
+    });
+    return;
+  }
+
+  try {
+    const response = await $axios.post('/p2p/trades', {
+      offer_id: selectedOffer.value.id,
+      amount: parseFloat(tradeAmount.value),
+    });
+
+    if (response.data && response.data.data && response.data.data.id) {
+      const tradeId = response.data.data.id;
+      notificationsStore.addNotification({
+        type: 'success',
+        message: 'La orden ha sido creada exitosamente.',
+      });
+      closeTradeModal();
+      navigateTo(`/p2p/trades/${tradeId}`);
+    } else {
+      notificationsStore.addNotification({
+        type: 'error',
+        message: 'Hubo un problema al crear la orden. Inténtalo de nuevo.',
+      });
+      console.error('La respuesta de la API no contiene el ID del trade.');
+    }
+  } catch (error) {
+    notificationsStore.addNotification({
+      type: 'error',
+      message: error.response?.data?.message || 'Error al crear el trade. Por favor, verifica los datos e inténtalo de nuevo.',
+    });
+    console.error('Error al crear el trade:', error);
+  }
 };
 </script>

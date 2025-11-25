@@ -50,29 +50,11 @@
         </div>
       </div>
 
-      <!-- Wallet Type Filter -->
-      <div class="mb-6">
-        <div class="flex border-b border-gray-700">
-          <button @click="activeWalletType = 'trading'" :class="activeWalletType === 'trading' ? 'border-yellow-500 text-white' : 'border-transparent text-gray-400'" class="px-4 py-2 font-semibold border-b-2 transition-colors text-sm sm:text-base">
-            Wallet de Trading
-          </button>
-          <button @click="activeWalletType = 'funding'" :class="activeWalletType === 'funding' ? 'border-yellow-500 text-white' : 'border-transparent text-gray-400'" class="px-4 py-2 font-semibold border-b-2 transition-colors text-sm sm:text-base">
-            Wallet de Funding
-          </button>
-        </div>
-      </div>
-
       <!-- Search and other filters -->
       <div class="flex flex-col sm:flex-row gap-3 mb-6">
         <div class="relative flex-grow">
           <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
           <input v-model="searchQuery" type="text" placeholder="Buscar activo..." class="w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-gray-800 text-white border border-gray-700" />
-        </div>
-        <div class="flex items-center gap-3">
-            <button @click="hideZeroBalances = !hideZeroBalances" :class="hideZeroBalances ? 'bg-yellow-500 text-gray-900' : 'bg-gray-800 text-white'" class="w-full sm:w-auto px-4 py-3 rounded-lg font-semibold transition whitespace-nowrap hover:opacity-90 border border-gray-700">
-              <i class="fas fa-filter text-xs mr-2"></i>
-              Ocultar balances bajos
-            </button>
         </div>
       </div>
 
@@ -93,18 +75,16 @@
               <tr v-for="wallet in filteredWallets" :key="wallet.symbol" class="hover:bg-gray-800 transition-colors">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center gap-3">
-                    <div class="h-10 w-10 rounded-full flex items-center justify-center font-bold text-white" :style="{ backgroundColor: wallet.color }">
-                      {{ wallet.symbol.substring(0, 3) }}
-                    </div>
+                    <img :src="wallet.icon" :alt="wallet.name" class="h-10 w-10 rounded-full">
                     <div>
                       <div class="text-sm font-semibold text-white">{{ wallet.name }}</div>
                       <div class="text-xs text-gray-400">{{ wallet.symbol }}</div>
                     </div>
                   </div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ showBalance ? (wallet.balance + wallet.locked).toFixed(8) : '••••••••' }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ showBalance ? wallet.balance.toFixed(8) : '••••••••' }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ showBalance ? wallet.locked.toFixed(8) : '••••••••' }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ wallet.balance + wallet.locked }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ wallet.balance}}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{  wallet.locked}}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
                   <div class="flex items-center justify-center gap-2">
                     <NuxtLink :to="`/deposit?asset=${wallet.symbol}`" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-1 px-3 rounded-md text-xs transition-colors">Depositar</NuxtLink>
@@ -113,11 +93,14 @@
                   </div>
                 </td>
               </tr>
-              <tr v-if="filteredWallets.length === 0">
+              <tr v-if="loading || filteredWallets.length === 0">
                 <td colspan="5" class="text-center py-12">
-                  <i class="fas fa-box-open fa-3x text-gray-600"></i>
-                  <p class="text-gray-400 text-lg mt-4">No se encontraron activos</p>
-                  <p class="text-sm text-gray-500">Intenta ajustar tu búsqueda o filtros.</p>
+                  <LoadingIndicator v-if="loading" />
+                  <div v-else>
+                    <i class="fas fa-box-open fa-3x text-gray-600"></i>
+                    <p class="text-gray-400 text-lg mt-4">No se encontraron activos</p>
+                    <p class="text-sm text-gray-500">Intenta ajustar tu búsqueda o filtros.</p>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -130,9 +113,7 @@
         <div v-for="wallet in filteredWallets" :key="wallet.symbol" class="bg-gray-850 border border-gray-800 rounded-xl p-4">
           <div class="flex justify-between items-center mb-4">
             <div class="flex items-center gap-3">
-              <div class="h-10 w-10 rounded-full flex items-center justify-center font-bold text-white" :style="{ backgroundColor: wallet.color }">
-                {{ wallet.symbol.substring(0, 3) }}
-              </div>
+              <img :src="wallet.icon" :alt="wallet.name" class="h-10 w-10 rounded-full">
               <div>
                 <div class="text-sm font-semibold text-white">{{ wallet.name }}</div>
                 <div class="text-xs text-gray-400">{{ wallet.symbol }}</div>
@@ -159,10 +140,13 @@
             <NuxtLink :to="`/withdraw?asset=${wallet.symbol}`" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-1 px-3 rounded-md text-xs transition-colors">Retirar</NuxtLink>
           </div>
         </div>
-        <div v-if="filteredWallets.length === 0" class="text-center py-12">
+        <div v-if="loading || filteredWallets.length === 0" class="text-center py-12">
+          <LoadingIndicator v-if="loading" />
+          <div v-else>
             <i class="fas fa-box-open fa-3x text-gray-600"></i>
             <p class="text-gray-400 text-lg mt-4">No se encontraron activos</p>
             <p class="text-sm text-gray-500">Intenta ajustar tu búsqueda o filtros.</p>
+          </div>
         </div>
       </div>
 
@@ -171,53 +155,28 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed, onBeforeMount } from 'vue';
+import { useWalletStore } from '~/stores/wallet.js';
+import LoadingIndicator from '~/components/p2p/LoadingIndicator.vue';
 
-useHead({
-  title: 'Mi Wallet',
-  meta: [
-    { name: 'description', content: 'Gestiona tus wallets de criptomonedas.' }
-  ]
-})
+const walletStore = useWalletStore();
 
-const showBalance = ref(true)
-const searchQuery = ref('')
-const activeWalletType = ref('trading')
-const hideZeroBalances = ref(false)
+onBeforeMount(() => {
+  walletStore.fetchWallets();
+});
 
-// Datos de ejemplo
-const wallets = ref([
-  { symbol: 'BTC', name: 'Bitcoin', balance: 0.25, locked: 0.00842, price: 65420, change24h: 2.5, walletType: 'trading', color: '#f7931a' },
-  { symbol: 'ETH', name: 'Ethereum', balance: 3.5, locked: 0.0482, price: 3240, change24h: 1.8, walletType: 'trading', color: '#627eea' },
-  { symbol: 'USDT', name: 'Tether', balance: 1250.00, locked: 0, price: 1, change24h: 0.01, walletType: 'funding', color: '#26a17b' },
-  { symbol: 'BNB', name: 'Binance Coin', balance: 12.5, locked: 2.5, price: 580, change24h: -0.5, walletType: 'trading', color: '#f3ba2f' },
-  { symbol: 'SOL', name: 'Solana', balance: 45.2, locked: 0, price: 165, change24h: 5.2, walletType: 'funding', color: '#14f195' },
-  { symbol: 'ADA', name: 'Cardano', balance: 2500, locked: 500, price: 0.45, change24h: -1.2, walletType: 'trading', color: '#0033ad' },
-  { symbol: 'XRP', name: 'Ripple', balance: 0, locked: 0, price: 0.52, change24h: 0.8, walletType: 'trading', color: '#23292f' },
-  { symbol: 'DOT', name: 'Polkadot', balance: 150.5, locked: 0, price: 7.2, change24h: 3.1, walletType: 'funding', color: '#e6007a' }
-])
+const showBalance = computed(() => walletStore.showBalance);
+const totalBalance = computed(() => walletStore.totalBalance);
+const availableBalance = computed(() => walletStore.availableBalance);
+const lockedBalance = computed(() => walletStore.lockedBalance);
+const filteredWallets = computed(() => walletStore.filteredWallets);
+const loading = computed(() => walletStore.loading);
+const error = computed(() => walletStore.error);
 
-const totalBalance = computed(() => {
-  return filteredWallets.value.reduce((sum, w) => sum + ((w.balance + w.locked) * w.price), 0)
-})
-
-const availableBalance = computed(() => {
-  return filteredWallets.value.reduce((sum, w) => sum + (w.balance * w.price), 0)
-})
-
-const lockedBalance = computed(() => {
-  return filteredWallets.value.reduce((sum, w) => sum + (w.locked * w.price), 0)
-})
-
-const filteredWallets = computed(() => {
-  return wallets.value.filter(w => {
-    const matchesSearch = w.name.toLowerCase().includes(searchQuery.value.toLowerCase()) || w.symbol.toLowerCase().includes(searchQuery.value.toLowerCase())
-    const matchesWalletType = w.walletType === activeWalletType.value
-    const matchesBalance = !hideZeroBalances.value || (w.balance + w.locked) > 0.00001
-    return matchesSearch && matchesWalletType && matchesBalance
-  })
-})
-
+const searchQuery = computed({
+  get: () => walletStore.searchQuery,
+  set: (value) => walletStore.setSearchQuery(value)
+});
 </script>
 
 <style scoped>

@@ -1,15 +1,33 @@
 import { defineStore } from 'pinia'
 import { useNuxtApp } from '#app'
+import { useAuthStore } from './auth' // Importar el store de autenticación
 
 export const useNotificationsStore = defineStore('notifications', {
   state: () => ({
     list: [],
     loading: false,
     error: null,
-    unreadCount: 0
+    unreadCount: 0,
+    toasts: [], // Estado para notificaciones temporales (toasts)
   }),
 
   actions: {
+    // Acción para añadir una notificación toast
+    addNotification(notification) {
+      const id = Date.now() + Math.random();
+      this.toasts.push({ ...notification, id });
+
+      // Eliminar la notificación después de 5 segundos
+      setTimeout(() => {
+        this.removeNotification(id);
+      }, 5000);
+    },
+
+    // Acción para eliminar una notificación toast
+    removeNotification(id) {
+      this.toasts = this.toasts.filter(n => n.id !== id);
+    },
+
     // Cargar notificaciones desde el servidor
     async fetchNotifications() {
       const { $axios } = useNuxtApp()
@@ -76,12 +94,22 @@ export const useNotificationsStore = defineStore('notifications', {
 
     // Obtener el contador de no leídas
     async fetchUnreadCount() {
+      const authStore = useAuthStore()
+      if (!authStore.isAuthenticated) {
+        this.unreadCount = 0
+        return
+      }
+
       const { $axios } = useNuxtApp()
       try {
         const response = await $axios.get('/notifications/unread-count')
         this.unreadCount = response.data.count
       } catch (e) {
         console.error('Error fetching unread count:', e)
+        // Si el error es 401, podría ser que el token expiró.
+        if (e.response && e.response.status === 401) {
+          this.unreadCount = 0 // Resetea el contador si no está autorizado
+        }
       }
     },
 

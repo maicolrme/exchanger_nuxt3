@@ -1,13 +1,18 @@
 // stores/auth.js
 import { defineStore } from 'pinia'
+import { useCookie } from '#app'
 
 export const useAuthStore = defineStore('auth', {
-  state: () => ({
-    user: null,
-    token: null,
-    loading: false,
-    error: null
-  }),
+  state: () => {
+    const token = useCookie('auth_token')
+    const user = useCookie('auth_user')
+    return {
+      user: user.value || null,
+      token: token.value || null,
+      loading: false,
+      error: null
+    }
+  },
 
   getters: {
     isAuthenticated: (state) => !!state.user && !!state.token,
@@ -17,14 +22,6 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-    // Inicializar el store
-    async initializeAuth() {
-      // Si tenemos token pero no usuario, cargar usuario
-      if (this.token && !this.user) {
-        await this.loadUser()
-      }
-    },
-
     // Cargar datos del usuario desde el servidor
     async loadUser() {
       if (!this.token) return
@@ -34,8 +31,10 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         const { $axios } = useNuxtApp()
-        const response = await $axios.get('/user')
+        const response = await $axios.get('/auth/user')
         this.user = response.data
+        const userCookie = useCookie('auth_user')
+        userCookie.value = response.data
       } catch (error) {
         console.error('Error al cargar usuario:', error)
         this.clearAuth()
@@ -55,6 +54,10 @@ export const useAuthStore = defineStore('auth', {
         const response = await $axios.post('/auth/login', { email, password })
 
         if (response.data.token) {
+          const tokenCookie = useCookie('auth_token')
+          const userCookie = useCookie('auth_user')
+          tokenCookie.value = response.data.token
+          userCookie.value = response.data.user
           this.token = response.data.token
           this.user = response.data.user
           
@@ -91,6 +94,10 @@ export const useAuthStore = defineStore('auth', {
         })
 
         if (response.data.success && response.data.token) {
+          const tokenCookie = useCookie('auth_token')
+          const userCookie = useCookie('auth_user')
+          tokenCookie.value = response.data.token
+          userCookie.value = response.data.user
           this.token = response.data.token
           this.user = response.data.user
           
@@ -113,8 +120,12 @@ export const useAuthStore = defineStore('auth', {
       this.error = null
 
       try {
-        const { $axios } = useNuxtApp()
-        await $axios.post('/logout')
+        const { $axios, $pusher } = useNuxtApp()
+        
+        await $axios.post('/auth/logout')
+        if ($pusher) {
+          $pusher.disconnect()
+        }
       } catch (error) {
         console.error('Error al cerrar sesión:', error)
       } finally {
@@ -125,6 +136,10 @@ export const useAuthStore = defineStore('auth', {
 
     // Limpiar datos de autenticación
     clearAuth() {
+      const tokenCookie = useCookie('auth_token')
+      const userCookie = useCookie('auth_user')
+      tokenCookie.value = null
+      userCookie.value = null
       this.user = null
       this.token = null
       this.error = null
@@ -134,10 +149,5 @@ export const useAuthStore = defineStore('auth', {
     clearError() {
       this.error = null
     }
-  },
-
-  // Configuración específica de persistencia
-  persist: {
-    pick: ['user', 'token'], // Solo persistir user y token, no loading ni error
   }
 })

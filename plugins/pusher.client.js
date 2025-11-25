@@ -33,6 +33,12 @@ export default defineNuxtPlugin((nuxtApp) => {
     console.error('Error de conexión con Pusher:', err)
   })
 
-  // Exponemos la instancia de Pusher a la aplicación Nuxt
-  nuxtApp.provide('pusher', pusher)
+  // Exponemos la instancia de Pusher y la función de desconexión a la aplicación Nuxt
+  nuxtApp.provide('pusher', {
+    instance: pusher,
+    disconnect: () => {
+      pusher.disconnect()
+      console.log('Pusher desconectado.')
+    }
+  })
 })
