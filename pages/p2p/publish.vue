@@ -22,7 +22,7 @@
 
         <div>
           <label for="crypto" class="block text-sm font-medium text-gray-300 mb-2">Criptomoneda:</label>
-          <CryptoInput v-model="form.crypto_currency_id" />
+          <CryptoInput v-model="form.currency_id" />
         </div>
 
         <div>
@@ -115,7 +115,7 @@ const { $axios } = useNuxtApp()
 // --- Estado Local del Formulario ---
 const form = reactive({
   type: 'buy',
-  crypto_currency_id: null,
+  currency_id: null,
   fiat_currency_id: null,
   minAmount: null,
   maxAmount: null,
@@ -134,8 +134,8 @@ const selectedPaymentId = ref(null)
 
 // --- Computed ---
 const selectedCryptoSymbol = computed(() => {
-  if (!form.crypto_currency_id) return 'Cripto'
-  const coin = cryptoCoins.value.find(c => c.id === form.crypto_currency_id)
+  if (!form.currency_id) return 'Cripto'
+  const coin = cryptoCoins.value.find(c => c.id === form.currency_id)
   return coin?.symbol || coin?.name || 'Cripto'
 })
 
@@ -174,7 +174,7 @@ const publishAd = async () => {
     time_limit: form.paymentWindow,
     terms: form.terms,
     price_premium: form.priceType === 'variable' ? form.pricePremium : undefined,
-    crypto_currency_id: form.crypto_currency_id,
+    currency_id: form.currency_id,
     fiat_currency_id: form.fiat_currency_id,
     payment_method_id: selectedPaymentId.value
   }

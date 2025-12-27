@@ -23,16 +23,7 @@
           </div>
         </div>
 
-        <div>
-          <label for="crypto" class="block text-sm font-medium text-gray-300 mb-2">Criptomoneda:</label>
-          <select id="crypto" v-model="form.crypto"
-            class="block w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
-            <option disabled value="">Seleccione una criptomoneda</option>
-            <option v-for="c in cryptoCoins" :key="c.id" :value="c.symbol || c.name">
-              {{ c.name || c.symbol }}
-            </option>
-          </select>
-        </div>
+       
 
         <div>
           <label for="fiat" class="block text-sm font-medium text-gray-300 mb-2">Moneda Fiat:</label>
@@ -175,7 +166,7 @@ onMounted(async () => {
     cryptoCoins.value = allCoins.filter(c => c.decimal_places !== 2 && c.offLedger !== 1 && c.network)
 
     // Rellenar formulario con datos del anuncio
-    const ad = adResp.data // Ajuste: La respuesta no está anidada en .data
+    const ad = adResp.data.data // Ajuste: La respuesta no está anidada en .data
     if (ad && ad.id) {
       form.type = ad.type
       form.crypto = ad.currency.symbol // Ajuste: el objeto es currency, no crypto_currency
@@ -213,7 +204,7 @@ const saveChanges = async () => {
     time_limit: form.paymentWindow,
     terms: form.terms,
     price_premium: form.priceType === 'variable' ? form.pricePremium : undefined,
-    crypto_currency_id: cryptoObj?.id,
+    currency_id: cryptoObj?.id,
     fiat_currency_id: form.fiatId,
     payment_method_id: selectedPaymentId.value,
     _method: 'PUT' // Laravel necesita esto para tratar POST como PUT

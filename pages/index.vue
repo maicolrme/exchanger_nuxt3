@@ -75,133 +75,186 @@
       </div>
     </section>
 
-    <!-- Stats Section -->
+    <!-- Markets Section -->
     <section class="py-16 bg-gray-900">
       <div class="container mx-auto px-4">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          <div>
-            <div class="stat-number">$450B+</div>
-            <div class="text-gray-400 mt-2">Volumen 24h</div>
-          </div>
-          <div>
-            <div class="stat-number">120M+</div>
-            <div class="text-gray-400 mt-2">Usuarios</div>
-          </div>
-          <div>
-            <div class="stat-number">350+</div>
-            <div class="text-gray-400 mt-2">Criptomonedas</div>
-          </div>
-          <div>
-            <div class="stat-number">0.1%</div>
-            <div class="text-gray-400 mt-2">Comisiones</div>
-          </div>
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">Mercados Principales</h2>
+          <p class="text-gray-400 text-lg max-w-2xl mx-auto mb-6">
+            Opera con más de 350 criptomonedas con las mejores comisiones del mercado
+          </p>
+          <NuxtLink 
+            to="/markets" 
+            class="inline-flex items-center gap-2 text-yellow-400 hover:text-yellow-300 font-semibold transition"
+          >
+            Ver todos los mercados
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </NuxtLink>
+        </div>
+        <div class="bg-gray-800 rounded-lg overflow-hidden shadow-xl border border-gray-700">
+          <MarketMarkets />
         </div>
       </div>
     </section>
 
+  
+
     <!-- Download App Section -->
-    <section class="py-16 bg-gray-900">
+    <section class="py-16 bg-gray-800">
       <div class="container mx-auto px-4">
         <div class="grid md:grid-cols-2 gap-12 items-center">
           <div>
+            <div class="inline-block bg-yellow-500 text-gray-900 text-xs font-bold px-3 py-1 rounded-full mb-4">
+              DISPONIBLE AHORA
+            </div>
             <h2 class="text-3xl md:text-4xl font-bold mb-6">Lleva el trading contigo</h2>
-            <p class="text-gray-400 text-lg mb-8">Descarga nuestra aplicación móvil y opera en cualquier momento y lugar. Disponible para iOS y Android.</p>
+            <p class="text-gray-400 text-lg mb-8">Descarga nuestra aplicación móvil y opera en cualquier momento y lugar. Disponible para iOS y Android con todas las funcionalidades de la plataforma web.</p>
             <div class="flex flex-wrap gap-4">
-              <a href="#" class="flex items-center bg-gray-800 hover:bg-gray-700 rounded-lg px-6 py-3 transition hover-scale">
-                <svg class="w-8 h-8 mr-3" viewBox="0 0 24 24" fill="currentColor">
+              <a href="#" class="flex items-center bg-gray-900 hover:bg-gray-800 rounded-lg px-6 py-4 transition hover-scale border border-gray-700">
+                <svg class="w-10 h-10 mr-3" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.08-.46-2.07-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.78 1.18-.19 2.31-.89 3.51-.84 1.54.07 2.7.61 3.44 1.57-3.14 1.88-2.29 6.12.82 7.33-.64 1.64-1.47 3.27-2.85 4.13zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.32 2.32-1.89 4.27-3.74 4.25z"/>
                 </svg>
                 <div>
-                  <div class="text-xs">Descarga en</div>
-                  <div class="text-sm font-semibold">App Store</div>
+                  <div class="text-xs text-gray-400">Descarga en</div>
+                  <div class="text-sm font-semibold text-white">App Store</div>
                 </div>
               </a>
-              <a href="#" class="flex items-center bg-gray-800 hover:bg-gray-700 rounded-lg px-6 py-3 transition hover-scale">
-                <svg class="w-8 h-8 mr-3" viewBox="0 0 24 24" fill="currentColor">
+              <a href="#" class="flex items-center bg-gray-900 hover:bg-gray-800 rounded-lg px-6 py-4 transition hover-scale border border-gray-700">
+                <svg class="w-10 h-10 mr-3" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.184l2.81-2.81 4.383 2.256c1.017.528 1.017 1.848 0 2.372l-4.383 2.256-2.81-2.81 2.81-2.81-2.81-2.81zm-.801.002L5.394 20.186l10.166-5.205-2.802-2.801a1.997 1.997 0 0 1 0-2.824l2.802-2.801L5.394 1.814 13.698 12z"/>
                 </svg>
                 <div>
-                  <div class="text-xs">Disponible en</div>
-                  <div class="text-sm font-semibold">Google Play</div>
+                  <div class="text-xs text-gray-400">Disponible en</div>
+                  <div class="text-sm font-semibold text-white">Google Play</div>
                 </div>
               </a>
             </div>
           </div>
-          <div class="hidden md:block">
-            <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.svg" alt="App Preview" class="w-full max-w-md mx-auto float-animation">
+          <div class="hidden md:flex justify-center items-center">
+            <div class="relative">
+              <div class="absolute inset-0 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-2xl blur-2xl opacity-20"></div>
+              <div class="relative bg-gray-800 rounded-2xl p-8 border border-gray-700">
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="bg-gray-900 rounded-lg p-4 text-center">
+                    <div class="text-yellow-400 font-bold text-2xl mb-1">BTC</div>
+                    <div class="text-gray-400 text-sm">Bitcoin</div>
+                  </div>
+                  <div class="bg-gray-900 rounded-lg p-4 text-center">
+                    <div class="text-yellow-400 font-bold text-2xl mb-1">ETH</div>
+                    <div class="text-gray-400 text-sm">Ethereum</div>
+                  </div>
+                  <div class="bg-gray-900 rounded-lg p-4 text-center">
+                    <div class="text-yellow-400 font-bold text-2xl mb-1">BNB</div>
+                    <div class="text-gray-400 text-sm">Binance</div>
+                  </div>
+                  <div class="bg-gray-900 rounded-lg p-4 text-center">
+                    <div class="text-yellow-400 font-bold text-2xl mb-1">SOL</div>
+                    <div class="text-gray-400 text-sm">Solana</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- Partners Section -->
-    <section class="py-16 bg-gray-900">
+    <section class="py-16 bg-gray-900 border-t border-gray-800">
       <div class="container mx-auto px-4">
-        <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Nuestros Socios</h2>
-        <p class="text-gray-400 text-center mb-12">Trabajamos con los mejores en la industria para brindarte un servicio de calidad</p>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center">
-          <div class="hover-scale transition-transform duration-300">
-            <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.svg" alt="Partner 1" class="h-12">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">Criptomonedas Soportadas</h2>
+          <p class="text-gray-400 text-lg max-w-2xl mx-auto">Opera con las principales criptomonedas del mercado</p>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 items-center justify-items-center">
+          <div class="bg-gray-800 rounded-lg p-4 w-full hover:bg-gray-750 transition hover-scale border border-gray-700">
+            <div class="text-center">
+              <div class="text-yellow-400 font-bold text-lg mb-1">BTC</div>
+              <div class="text-gray-400 text-xs">Bitcoin</div>
+            </div>
           </div>
-          <div class="hover-scale transition-transform duration-300">
-            <img src="https://cryptologos.cc/logos/ethereum-eth-logo.svg" alt="Partner 2" class="h-12">
+          <div class="bg-gray-800 rounded-lg p-4 w-full hover:bg-gray-750 transition hover-scale border border-gray-700">
+            <div class="text-center">
+              <div class="text-yellow-400 font-bold text-lg mb-1">ETH</div>
+              <div class="text-gray-400 text-xs">Ethereum</div>
+            </div>
           </div>
-          <div class="hover-scale transition-transform duration-300">
-            <img src="https://cryptologos.cc/logos/binance-coin-bnb-logo.svg" alt="Partner 3" class="h-12">
+          <div class="bg-gray-800 rounded-lg p-4 w-full hover:bg-gray-750 transition hover-scale border border-gray-700">
+            <div class="text-center">
+              <div class="text-yellow-400 font-bold text-lg mb-1">BNB</div>
+              <div class="text-gray-400 text-xs">Binance</div>
+            </div>
           </div>
-          <div class="hover-scale transition-transform duration-300">
-            <img src="https://cryptologos.cc/logos/cardano-ada-logo.svg" alt="Partner 4" class="h-12">
+          <div class="bg-gray-800 rounded-lg p-4 w-full hover:bg-gray-750 transition hover-scale border border-gray-700">
+            <div class="text-center">
+              <div class="text-yellow-400 font-bold text-lg mb-1">SOL</div>
+              <div class="text-gray-400 text-xs">Solana</div>
+            </div>
+          </div>
+          <div class="bg-gray-800 rounded-lg p-4 w-full hover:bg-gray-750 transition hover-scale border border-gray-700">
+            <div class="text-center">
+              <div class="text-yellow-400 font-bold text-lg mb-1">ADA</div>
+              <div class="text-gray-400 text-xs">Cardano</div>
+            </div>
+          </div>
+          <div class="bg-gray-800 rounded-lg p-4 w-full hover:bg-gray-750 transition hover-scale border border-gray-700">
+            <div class="text-center">
+              <div class="text-yellow-400 font-bold text-lg mb-1">350+</div>
+              <div class="text-gray-400 text-xs">Más monedas</div>
+            </div>
           </div>
         </div>
       </div>
     </section>
     
     <!-- Benefits Section -->
-    <section class="py-16 bg-gray-800">
+    <section class="py-16 bg-gray-800 border-t border-gray-700">
       <div class="container mx-auto px-4">
         <div class="text-center mb-16">
           <h2 class="text-3xl md:text-4xl font-bold mb-4">Beneficios Exclusivos</h2>
           <p class="text-gray-400 text-lg max-w-2xl mx-auto">Descubre por qué millones de traders eligen CryptoEx para sus operaciones diarias</p>
         </div>
-        <div class="grid md:grid-cols-4 gap-8">
-          <div class="text-center hover-scale transition-transform duration-300">
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="bg-gray-900 rounded-lg p-6 text-center hover:bg-gray-850 transition transform hover:scale-105 border border-gray-700">
             <div class="w-16 h-16 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
-            <div class="stat-number mb-2">$50M+</div>
-            <h3 class="font-bold mb-2">Liquidez Diaria</h3>
+            <div class="stat-number mb-2 text-2xl">$50M+</div>
+            <h3 class="font-bold mb-2 text-lg">Liquidez Diaria</h3>
             <p class="text-gray-400 text-sm">Amplio volumen de trading y profundidad de mercado</p>
           </div>
-          <div class="text-center hover-scale transition-transform duration-300">
+          <div class="bg-gray-900 rounded-lg p-6 text-center hover:bg-gray-850 transition transform hover:scale-105 border border-gray-700">
             <div class="w-16 h-16 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
               </svg>
             </div>
-            <div class="stat-number mb-2">100%</div>
-            <h3 class="font-bold mb-2">Fondos Seguros</h3>
+            <div class="stat-number mb-2 text-2xl">100%</div>
+            <h3 class="font-bold mb-2 text-lg">Fondos Seguros</h3>
             <p class="text-gray-400 text-sm">Protección total de activos y datos personales</p>
           </div>
-          <div class="text-center hover-scale transition-transform duration-300">
+          <div class="bg-gray-900 rounded-lg p-6 text-center hover:bg-gray-850 transition transform hover:scale-105 border border-gray-700">
             <div class="w-16 h-16 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
               </svg>
             </div>
-            <div class="stat-number mb-2">0.1s</div>
-            <h3 class="font-bold mb-2">Ejecución</h3>
+            <div class="stat-number mb-2 text-2xl">0.1s</div>
+            <h3 class="font-bold mb-2 text-lg">Ejecución</h3>
             <p class="text-gray-400 text-sm">Velocidad de ejecución de órdenes ultrarrápida</p>
           </div>
-          <div class="text-center hover-scale transition-transform duration-300">
+          <div class="bg-gray-900 rounded-lg p-6 text-center hover:bg-gray-850 transition transform hover:scale-105 border border-gray-700">
             <div class="w-16 h-16 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
               </svg>
             </div>
-            <div class="stat-number mb-2">24/7</div>
-            <h3 class="font-bold mb-2">Soporte</h3>
+            <div class="stat-number mb-2 text-2xl">24/7</div>
+            <h3 class="font-bold mb-2 text-lg">Soporte</h3>
             <p class="text-gray-400 text-sm">Asistencia profesional en múltiples idiomas</p>
           </div>
         </div>
@@ -209,39 +262,39 @@
     </section>
     
     <!-- Features Section -->
-    <section class="py-16 bg-gray-800">
+    <section class="py-16 bg-gray-800 border-t border-gray-700">
       <div class="container mx-auto px-4">
         <div class="text-center mb-12">
           <h2 class="text-3xl md:text-4xl font-bold mb-4">¿Por qué elegir CryptoEx?</h2>
-          <p class="text-gray-400 text-lg">La plataforma más segura y confiable para tus inversiones</p>
+          <p class="text-gray-400 text-lg max-w-2xl mx-auto">La plataforma más segura y confiable para tus inversiones en criptomonedas</p>
         </div>
-        <div class="grid md:grid-cols-3 gap-8">
-          <div class="bg-gray-700 rounded-lg p-6 hover:bg-gray-750 transition">
-            <div class="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="bg-gray-900 rounded-lg p-8 hover:bg-gray-850 transition transform hover:scale-105 border border-gray-700">
+            <div class="w-14 h-14 bg-yellow-500 rounded-lg flex items-center justify-center mb-6">
+              <svg class="w-7 h-7 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
               </svg>
             </div>
-            <h3 class="text-xl font-bold mb-2">Seguridad de Nivel Mundial</h3>
-            <p class="text-gray-400">Protección con autenticación de dos factores, cold storage y seguro de fondos.</p>
+            <h3 class="text-xl font-bold mb-3">Seguridad de Nivel Mundial</h3>
+            <p class="text-gray-400 leading-relaxed">Protección con autenticación de dos factores, cold storage y seguro de fondos. Tus activos están seguros con nosotros.</p>
           </div>
-          <div class="bg-gray-700 rounded-lg p-6 hover:bg-gray-750 transition">
-            <div class="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-gray-900 rounded-lg p-8 hover:bg-gray-850 transition transform hover:scale-105 border border-gray-700">
+            <div class="w-14 h-14 bg-yellow-500 rounded-lg flex items-center justify-center mb-6">
+              <svg class="w-7 h-7 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
               </svg>
             </div>
-            <h3 class="text-xl font-bold mb-2">Trading Ultra Rápido</h3>
-            <p class="text-gray-400">Ejecuta órdenes en milisegundos con nuestra tecnología de matching engine.</p>
+            <h3 class="text-xl font-bold mb-3">Trading Ultra Rápido</h3>
+            <p class="text-gray-400 leading-relaxed">Ejecuta órdenes en milisegundos con nuestra tecnología de matching engine de última generación.</p>
           </div>
-          <div class="bg-gray-700 rounded-lg p-6 hover:bg-gray-750 transition">
-            <div class="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-gray-900 rounded-lg p-8 hover:bg-gray-850 transition transform hover:scale-105 border border-gray-700">
+            <div class="w-14 h-14 bg-yellow-500 rounded-lg flex items-center justify-center mb-6">
+              <svg class="w-7 h-7 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
               </svg>
             </div>
-            <h3 class="text-xl font-bold mb-2">Soporte 24/7</h3>
-            <p class="text-gray-400">Nuestro equipo está disponible todo el día para ayudarte con cualquier consulta.</p>
+            <h3 class="text-xl font-bold mb-3">Soporte 24/7</h3>
+            <p class="text-gray-400 leading-relaxed">Nuestro equipo está disponible todo el día para ayudarte con cualquier consulta o problema que puedas tener.</p>
           </div>
         </div>
       </div>

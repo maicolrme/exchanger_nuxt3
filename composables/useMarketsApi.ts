@@ -3,7 +3,7 @@ export const useMarketsApi = () => {
 
   const getMarketsData = async () => {
     try {
-      const response = await $axios.get('/trading/public/markets/data')
+      const response = await $axios.get('/markets')
       return response.data.data // Accedemos a la propiedad 'data' de la respuesta
     } catch (error) {
       console.error('Error fetching markets data:', error)
@@ -11,7 +11,17 @@ export const useMarketsApi = () => {
     }
   }
 
+  const fetchMarkets = async () => {
+    return await $axios.get('api/markets');
+  };
+
+  const fetchMarket = async (market: string) => {
+    return await $axios.get(`api/market/${market}`);
+  };
+
   return {
-    getMarketsData,
-  }
+    fetchMarkets,
+    fetchMarket,
+     getMarketsData,
+  };
 }

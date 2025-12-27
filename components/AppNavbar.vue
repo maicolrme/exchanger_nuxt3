@@ -62,7 +62,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const authStore = useAuthStore();
 
@@ -70,8 +70,11 @@ const authStore = useAuthStore();
 const user = computed(() => authStore.user);
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 
+const isMounted = ref(false);
+
 // Solo cargar usuario en el cliente para evitar problemas de hidratación
 onMounted(() => {
+  isMounted.value = true;
   if (process.client && authStore.token && !authStore.user) {
     authStore.loadUser();
   }

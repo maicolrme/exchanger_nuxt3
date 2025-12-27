@@ -54,6 +54,11 @@ export const useTradeApi = () => {
     }
   }
 
+  const fetchOrderbook = async (market: string) => {
+    const response = await $axios.get(`/trading/orderbook/${market}`)
+    return response.data
+  }
+
   return {
     getTrade,
     markAsPaid,
@@ -61,6 +66,7 @@ export const useTradeApi = () => {
     cancelTrade,
     openDispute,
     uploadPaymentProof,
-    sendMessage
+    sendMessage,
+    fetchOrderbook
   }
-}
+}
